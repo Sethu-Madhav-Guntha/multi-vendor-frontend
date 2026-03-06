@@ -5,12 +5,17 @@ import App from "./App.tsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from "./features/authentication/Login.tsx";
 import Signup from "./features/authentication/Signup.tsx";
+import Home from "./pages/Home.tsx";
 
 const multiVendorFrontendRouter = createBrowserRouter([
   {
     path: "/",
     element: <App />,
     children: [
+      {
+        path: "/",
+        element: <Home />,
+      },
       {
         path: "/login",
         element: <Login />,
