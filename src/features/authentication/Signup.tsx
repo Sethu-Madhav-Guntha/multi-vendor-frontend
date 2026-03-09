@@ -1,7 +1,7 @@
 import axios from "axios";
 
 function Signup() {
-  const signUpUrl = `${import.meta.env.VITE_BACKEND_BASE_URI}/signup`;
+  const signUpUrl = `${import.meta.env.VITE_BACKEND_BASE_URI}/auth/signup`;
 
   const handleSignUpSubmit = () => {
     event?.preventDefault();
@@ -41,9 +41,9 @@ function Signup() {
           placeholder="Enter Password"
         />
         <br />
-        <input type="radio" name="role" id="buyerId" />
+        <input type="radio" name="role" id="buyerId" value="Buyer" />
         <label htmlFor="buyerId">Buyer</label>
-        <input type="radio" name="role" id="vendorId" />
+        <input type="radio" name="role" id="vendorId" value="Vendor" />
         <label htmlFor="vendorId">Vendor</label>
         <br />
         <button type="submit">Sign Up</button>

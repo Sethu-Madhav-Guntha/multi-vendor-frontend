@@ -1,11 +1,10 @@
 function Login() {
-  const loginUrl = `${import.meta.env.VITE_BACKEND_BASE_URI}/login`;
+  const loginUrl = `${import.meta.env.VITE_BACKEND_BASE_URI}/auth/login`;
 
   const onLoginSubmit = () => {
     event?.preventDefault();
     const loginForm = new FormData(event.target);
     const loginFormValues = Object.fromEntries(loginForm.entries());
-    console.log(loginFormValues);
     fetch(loginUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
