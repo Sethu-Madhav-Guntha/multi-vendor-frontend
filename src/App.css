@@ -7,9 +7,21 @@
     justify-content: space-between;
 }
 
-#navbarList div{
+#navbarList div {
     display: flex;
     flex-direction: row;
     gap: 10px;
     margin: 0;
+}
+
+.footer-list {
+    position: fixed;
+    left: 0%;
+    bottom: 0%;
+    list-style: none;
+    width: 100%;
+    display: flex;
+    padding: 20px;
+    justify-content: flex-end;
+    box-sizing: border-box;
 }

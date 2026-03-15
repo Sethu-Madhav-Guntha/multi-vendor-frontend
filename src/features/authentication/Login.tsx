@@ -1,5 +1,9 @@
+import { useLocation } from "react-router-dom";
+
 function Login() {
   const loginUrl = `${import.meta.env.VITE_BACKEND_BASE_URI}/auth/login`;
+  const location = useLocation();
+  const loginEmail = location.state.email || "";
 
   const onLoginSubmit = () => {
     event?.preventDefault();
@@ -22,22 +26,25 @@ function Login() {
       <h1>Login Component</h1>
       <form onSubmit={onLoginSubmit}>
         <label htmlFor="emailId">
-          Provide Email:
+          Email:
           <input
             type="email"
             name="email"
             id="emailId"
             placeholder="Enter Email"
+            defaultValue={loginEmail}
+            required
           />
         </label>
         <br />
         <label htmlFor="passwordId">
-          Provide Password:
+          Password:
           <input
             type="password"
             name="password"
             id="passwordId"
             placeholder="Enter Password"
+            required
           />
         </label>
         <br />
