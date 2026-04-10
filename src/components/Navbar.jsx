@@ -7,7 +7,7 @@ import { useUserDetailsQuery } from "../features/auth/authService";
 function Navbar() {
   const dispatchFn = useDispatch();
   const navigateFn = useNavigate();
-  let user = useSelector((state) => state.authReducer?.user);
+  let user = useSelector((state) => state?.authReducer?.user);
   const token = localStorage.getItem("token");
   const { data } = useUserDetailsQuery(token, { skip: !token });
 
@@ -29,17 +29,22 @@ function Navbar() {
         <li>
           <Link to="/">Home</Link>
         </li>
-        <li>
-          <Link to="/stores">Stores</Link>
-        </li>
-        <li>
-          <Link to="/cart">Cart</Link>
-        </li>
-        <li>
-          <Link to="/orders">Orders</Link>
-        </li>
         {user?.username && (
           <>
+            {user?.role === "Vendor" && (
+              <li>
+                <Link to="/outlets">Outlets</Link>
+              </li>
+            )}
+            {user?.role === "User" && (
+              <li>
+                <Link to="/cart">Cart</Link>
+              </li>
+            )}
+            <li>
+              <Link to="/orders">Orders</Link>
+            </li>
+
             <div>{user?.username}</div>
             <button onClick={onLogoutClick}>Log Out</button>
           </>

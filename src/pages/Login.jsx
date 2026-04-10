@@ -42,6 +42,7 @@ function Login() {
           name="email"
           id="emailId"
           placeholder="Provide Email Here"
+          autoFocus
         />
         <br />
         <label htmlFor="passwordId">Enter Password:</label>

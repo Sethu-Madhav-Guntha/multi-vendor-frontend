@@ -11,9 +11,6 @@ function Register() {
     event.preventDefault();
     const registerForm = new FormData(event.target);
     const registerFormData = Object.fromEntries(registerForm.entries());
-    // console.log(registerFormData);
-    // const result =
-    // console.log(result);
 
     registerUserFn(registerFormData)
       .then((res) => {
@@ -34,6 +31,7 @@ function Register() {
           name="username"
           id="usernameId"
           placeholder="Provide Username Here"
+          autoFocus
         />
         <br />
         <label htmlFor="emailId">Enter Email:</label>

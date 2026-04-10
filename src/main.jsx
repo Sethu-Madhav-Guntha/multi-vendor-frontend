@@ -8,7 +8,8 @@ import App from "./App.jsx";
 import Home from "./pages/Home.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
-import Stores from "./pages/Stores.jsx";
+import Outlets from "./pages/Outlets.jsx";
+import OutletDetails from "./features/outlet/OutletDetails.jsx";
 import Cart from "./pages/Cart.jsx";
 import Orders from "./pages/Orders.jsx";
 import { multiVendorStore } from "./app/store.js";
@@ -23,8 +24,12 @@ const multiVendorRouter = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "/stores",
-        element: <Stores />,
+        path: "/outlets",
+        element: <Outlets />,
+      },
+      {
+        path: "/outlets/:outletId",
+        element: <OutletDetails />,
       },
       {
         path: "/cart",
