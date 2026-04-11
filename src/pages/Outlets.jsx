@@ -6,8 +6,8 @@ import {
   useRemoveOutletMutation,
   useUpdateOutletMutation,
 } from "../features/outlet/outletService";
-import { Link, Outlet, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function Outlets() {
   const [editFlag, setEditFlag] = useState(false);
@@ -17,7 +17,6 @@ function Outlets() {
   const descriptionRef = useRef();
 
   const navigateFn = useNavigate();
-  const dispatchFn = useDispatch();
   const token = useSelector((state) => state?.authReducer?.token);
 
   const [createOutletFn] = useCreateOutletMutation();
@@ -37,7 +36,6 @@ function Outlets() {
     await removeOutletFn({ id: outletId, token });
     navigateFn("/outlets");
     fetchOutletsFn(token);
-
   };
 
   const onOutletDetailsSubmit = async () => {
@@ -45,9 +43,8 @@ function Outlets() {
     const outletForm = new FormData(event.target);
     const outletFormData = Object.fromEntries(outletForm.entries());
     event.target.reset();
-    let outletInfo;
     if (editFlag) {
-      outletInfo = await updateOutletFn({
+      await updateOutletFn({
         outletInfo: {
           _id: outletDetails._id,
           ...outletFormData,
@@ -56,7 +53,7 @@ function Outlets() {
       });
       setEditFlag(false);
     } else {
-      outletInfo = await createOutletFn({ outletInfo: outletFormData, token });
+      await createOutletFn({ outletInfo: outletFormData, token });
     }
     fetchOutletsFn(token);
   };

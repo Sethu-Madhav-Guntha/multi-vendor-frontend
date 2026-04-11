@@ -20,7 +20,7 @@ export const outletApi = createApi({
         }),
         fetchOutlets: builder.query({
             query: (token) => ({
-                url: "/",
+                url: `/`,
                 method: "GET",
                 headers: {
                     authorization: `Bearer ${token}`
@@ -58,4 +58,4 @@ export const outletApi = createApi({
     })
 })
 
-export const { useCreateOutletMutation, useFetchOutletsQuery, useFetchOutletByIdQuery, useLazyFetchOutletsQuery, useUpdateOutletMutation, useRemoveOutletMutation } = outletApi;
+export const { useCreateOutletMutation, useFetchOutletsQuery, useFetchOutletByIdQuery, useLazyFetchOutletByIdQuery, useLazyFetchOutletsQuery, useUpdateOutletMutation, useRemoveOutletMutation } = outletApi;

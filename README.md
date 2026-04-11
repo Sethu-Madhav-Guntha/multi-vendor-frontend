@@ -1,7 +1,11 @@
 # multi-vendor-frontend
+Implemented Products Functionalities.
+Displayed Products at Home Page.
+Current Version: 4.0.0
+-----------------------------------------------------------------
 Implemented Outlet Functionalities.
 Added auto focus at login and register forms. 
-Current Version: 3.0.0
+at this Version: 3.0.0
 -----------------------------------------------------------------
 Installed React-Redux ReduxToolkit/Query for managing data at Global level for the entire application.
 Implemented User Login and Register Functionalities.
