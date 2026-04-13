@@ -1,7 +1,11 @@
 # multi-vendor-frontend
+Frontend Application Code for Multi-Vendor Web Application.
+Implemented Cart Functionalities.
+Current Version: 5.0.0
+-----------------------------------------------------------------
 Implemented Products Functionalities.
 Displayed Products at Home Page.
-Current Version: 4.0.0
+at this Version: 4.0.0
 -----------------------------------------------------------------
 Implemented Outlet Functionalities.
 Added auto focus at login and register forms. 
@@ -19,4 +23,3 @@ at this Version: 1.0.0
 Removed Unnecessary files on initial setup
 at this Version: 0.0.1
 -----------------------------------------------------------------
-Frontend Application Code for Multi-Vendor Web Application.

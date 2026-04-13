@@ -1,10 +1,19 @@
 import { useSelector } from "react-redux";
 import { useFetchAllProductsQuery } from "../features/products/productService";
+import { useAddToCartMutation } from "../features/cart/cartService";
 
 function Home() {
+  const [addToCartFn] = useAddToCartMutation();
   const { data: allProducts } = useFetchAllProductsQuery();
-  console.log(allProducts);
   const userInfo = useSelector((state) => state?.authReducer);
+
+  const onCartProductClick = async (productId) => {
+    await addToCartFn({ productId, token: userInfo?.token });
+  };
+
+  const onBuyProductClick = (productId) => {
+    console.log("Buying Product", productId);
+  };
   return (
     <div>
       <h1>Home Page</h1>
@@ -30,7 +39,7 @@ function Home() {
                   <>
                     <button
                       onClick={() => {
-                        onCartProductClick(product);
+                        onCartProductClick(product._id);
                       }}
                     >
                       Cart

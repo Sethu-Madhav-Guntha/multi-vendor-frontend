@@ -20,9 +20,9 @@ function Outlets() {
   const token = useSelector((state) => state?.authReducer?.token);
 
   const [createOutletFn] = useCreateOutletMutation();
-  const [fetchOutletsFn] = useLazyFetchOutletsQuery();
   const [updateOutletFn] = useUpdateOutletMutation();
   const [removeOutletFn] = useRemoveOutletMutation();
+  const [fetchOutletsFn] = useLazyFetchOutletsQuery();
   const { data } = useFetchOutletsQuery(token);
 
   const onUpdateOutletClick = async (outlet) => {
