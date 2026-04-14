@@ -7,6 +7,7 @@ import {
   useRemoveItemMutation,
 } from "../features/cart/cartService";
 import { useEffect } from "react";
+import { useCreateOrderMutation } from "../features/order/orderService";
 
 function Cart() {
   const token = useSelector((state) => state?.authReducer?.token);
@@ -15,6 +16,7 @@ function Cart() {
   const [removeCartItemFn] = useRemoveItemMutation();
   const [clearCartFn] = useClearCartMutation();
   const [addToCartFn] = useAddToCartMutation();
+  const [createOrderFn] = useCreateOrderMutation();
 
   const onIncrementItemClick = async (item) => {
     await addToCartFn({ productId: item.product._id, token });
@@ -44,6 +46,16 @@ function Cart() {
     fetchCartItemsFn({ token });
   };
 
+  const onBuyNowClick = async () => {
+    const items = cartItems?.cart?.items?.map((item) => ({
+      productId: item.product._id,
+      quantity: item.quantity,
+    }));
+    await createOrderFn({ items, token });
+    await onClearCartClick();
+    console.log("Buying Cart Items");
+  };
+
   useEffect(() => {
     refetch();
   }, []);
@@ -52,13 +64,19 @@ function Cart() {
     <div>
       <h1>Cart Page</h1>
       <h2>Products added to Cart</h2>
-      <button
-        onClick={() => {
-          onClearCartClick();
-        }}
-      >
-        Clear Cart Items
-      </button>
+      {cartItems?.cart?.items.length > 0 && (
+        <>
+          <h4>Total Price: {cartItems?.totalAmount}/-</h4>
+          <button
+            onClick={() => {
+              onClearCartClick();
+            }}
+          >
+            Clear Cart Items
+          </button>
+          <button onClick={() => onBuyNowClick()}>Buy Items</button>
+        </>
+      )}
       <ul>
         {cartItems &&
           cartItems?.cart?.items?.map((item) => (

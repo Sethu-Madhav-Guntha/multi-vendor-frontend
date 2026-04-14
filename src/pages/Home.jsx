@@ -1,19 +1,31 @@
 import { useSelector } from "react-redux";
-import { useFetchAllProductsQuery } from "../features/products/productService";
+import {
+  useFetchAllProductsQuery,
+  useLazyFetchAllProductsQuery,
+} from "../features/products/productService";
 import { useAddToCartMutation } from "../features/cart/cartService";
+import { useCreateOrderMutation } from "../features/order/orderService";
 
 function Home() {
   const [addToCartFn] = useAddToCartMutation();
+  const [createOrderFn] = useCreateOrderMutation();
   const { data: allProducts } = useFetchAllProductsQuery();
+  const [fetchAllProductsFn] = useLazyFetchAllProductsQuery();
   const userInfo = useSelector((state) => state?.authReducer);
 
   const onCartProductClick = async (productId) => {
     await addToCartFn({ productId, token: userInfo?.token });
+    fetchAllProductsFn();
   };
 
-  const onBuyProductClick = (productId) => {
-    console.log("Buying Product", productId);
+  const onBuyProductClick = async (productId) => {
+    await createOrderFn({
+      items: [{ productId, quantity: 1 }],
+      token: userInfo?.token,
+    });
+    fetchAllProductsFn();
   };
+  
   return (
     <div>
       <h1>Home Page</h1>

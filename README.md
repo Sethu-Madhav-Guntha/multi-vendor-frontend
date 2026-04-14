@@ -1,7 +1,10 @@
 # multi-vendor-frontend
 Frontend Application Code for Multi-Vendor Web Application.
+Implemented Customer Order Functionalities.
+Current Version: 6.0.0
+-----------------------------------------------------------------
 Implemented Cart Functionalities.
-Current Version: 5.0.0
+at this Version: 5.0.0
 -----------------------------------------------------------------
 Implemented Products Functionalities.
 Displayed Products at Home Page.

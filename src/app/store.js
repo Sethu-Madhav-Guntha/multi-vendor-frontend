@@ -7,6 +7,7 @@ import { authApi } from "../features/auth/authService";
 import { outletApi } from "../features/outlet/outletService";
 import { productApi } from "../features/products/productService";
 import { cartApi } from "../features/cart/cartService";
+import { orderApi } from "../features/order/orderService";
 
 export const multiVendorStore = configureStore({
     reducer: {
@@ -15,9 +16,10 @@ export const multiVendorStore = configureStore({
         [authApi.reducerPath]: authApi.reducer,
         [outletApi.reducerPath]: outletApi.reducer,
         [productApi.reducerPath]: productApi.reducer,
-        [cartApi.reducerPath]: cartApi.reducer
+        [cartApi.reducerPath]: cartApi.reducer,
+        [orderApi.reducerPath]: orderApi.reducer
     },
     middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(authApi.middleware, outletApi.middleware, productApi.middleware, cartApi.middleware),
+        getDefaultMiddleware().concat(authApi.middleware, outletApi.middleware, productApi.middleware, cartApi.middleware, orderApi.middleware),
 });
 setupListeners(multiVendorStore.dispatch);
