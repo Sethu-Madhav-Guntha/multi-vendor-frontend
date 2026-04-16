@@ -10,7 +10,7 @@ export const orderApi = createApi({
     endpoints: (builder) => ({
         createOrder: builder.mutation({
             query: ({ items, token }) => ({
-                url: `/create`,
+                url: `/customer/create`,
                 method: "POST",
                 headers: {
                     authorization: `Bearer ${token}`
@@ -20,7 +20,7 @@ export const orderApi = createApi({
         }),
         getCustomerOrders: builder.query({
             query: ({ token }) => ({
-                url: `/`,
+                url: `/customer`,
                 method: "GET",
                 headers: {
                     authorization: `Bearer ${token}`
@@ -29,7 +29,7 @@ export const orderApi = createApi({
         }),
         getOrderById: builder.query({
             query: ({ orderId, token }) => ({
-                url: `/${orderId}`,
+                url: `/customer/${orderId}`,
                 method: "GET",
                 headers: {
                     authorization: `Bearer ${token}`
@@ -38,14 +38,44 @@ export const orderApi = createApi({
         }),
         cancelOrder: builder.mutation({
             query: ({ orderId, token }) => ({
-                url: `/${orderId}`,
+                url: `/customer/${orderId}`,
                 method: "DELETE",
                 headers: {
                     authorization: `Bearer ${token}`
+                }
+            })
+        }),
+        listStoreOrders: builder.query({
+            query: ({ storeId, token }) => ({
+                url: `/store/${storeId}`,
+                method: "GET",
+                headers: {
+                    authorization: `Bearer ${token}`
+                }
+            })
+        }),
+        vendorOrders: builder.query({
+            query: ({ token }) => ({
+                url: `/vendor`,
+                method: "GET",
+                headers: {
+                    authorization: `Bearer ${token}`
+                }
+            })
+        }),
+        updateOrder: builder.mutation({
+            query: ({ orderId, status, token }) => ({
+                url: `/vendor/${orderId}`,
+                method: "PUT",
+                headers: {
+                    authorization: `Bearer ${token}`
+                },
+                body: {
+                    status
                 }
             })
         })
     })
 });
 
-export const { useCreateOrderMutation, useGetCustomerOrdersQuery, useLazyGetCustomerOrdersQuery, useLazyGetOrderByIdQuery, useCancelOrderMutation } = orderApi;
+export const { useCreateOrderMutation, useGetCustomerOrdersQuery, useLazyGetCustomerOrdersQuery, useLazyGetOrderByIdQuery, useCancelOrderMutation, useListStoreOrdersQuery, useLazyListStoreOrdersQuery, useVendorOrdersQuery, useLazyVendorOrdersQuery, useUpdateOrderMutation } = orderApi;

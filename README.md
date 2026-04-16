@@ -1,7 +1,11 @@
 # multi-vendor-frontend
 Frontend Application Code for Multi-Vendor Web Application.
+Implemented Vendor Order Functionalities. 
+Added useEffect for fetching Customer Orders on rendering Order Page.
+Current Version: 6.1.0
+-----------------------------------------------------------------
 Implemented Customer Order Functionalities.
-Current Version: 6.0.0
+at this Version: 6.0.0
 -----------------------------------------------------------------
 Implemented Cart Functionalities.
 at this Version: 5.0.0
