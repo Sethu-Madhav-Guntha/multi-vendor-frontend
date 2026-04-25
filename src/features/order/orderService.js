@@ -15,7 +15,7 @@ export const orderApi = createApi({
                 headers: {
                     authorization: `Bearer ${token}`
                 },
-                body: { items }
+                body: items
             })
         }),
         getCustomerOrders: builder.query({
@@ -29,7 +29,7 @@ export const orderApi = createApi({
         }),
         getOrderById: builder.query({
             query: ({ orderId, token }) => ({
-                url: `/customer/${orderId}`,
+                url: `/${orderId}`,
                 method: "GET",
                 headers: {
                     authorization: `Bearer ${token}`

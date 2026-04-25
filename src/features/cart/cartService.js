@@ -9,13 +9,13 @@ export const cartApi = createApi({
   }),
   endpoints: (builder) => ({
     addToCart: builder.mutation({
-      query: ({ productId, token }) => ({
+      query: ({ productId, sellingPrice, token }) => ({
         url: `/add`,
         method: "POST",
         headers: {
           authorization: `Bearer ${token}`,
         },
-        body: { productId, quantity: 1 },
+        body: { productId, quantity: 1, sellingPrice },
       }),
     }),
     cartItems: builder.query({

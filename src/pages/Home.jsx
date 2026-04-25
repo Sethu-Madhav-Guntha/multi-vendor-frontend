@@ -13,19 +13,19 @@ function Home() {
   const [fetchAllProductsFn] = useLazyFetchAllProductsQuery();
   const userInfo = useSelector((state) => state?.authReducer);
 
-  const onCartProductClick = async (productId) => {
-    await addToCartFn({ productId, token: userInfo?.token });
+  const onCartProductClick = async (productId, sellingPrice) => {
+    await addToCartFn({ productId, sellingPrice, token: userInfo?.token });
     fetchAllProductsFn();
   };
 
-  const onBuyProductClick = async (productId) => {
+  const onBuyProductClick = async (productId, sellingPrice) => {
     await createOrderFn({
-      items: [{ productId, quantity: 1 }],
+      items: [{ productId, quantity: 1, sellingPrice }],
       token: userInfo?.token,
     });
     fetchAllProductsFn();
   };
-  
+
   return (
     <div>
       <h1>Home Page</h1>
@@ -47,18 +47,28 @@ function Home() {
                 />
                 <h5>Price: {product.price}</h5>
                 <h6>Quantity: {product.quantity}</h6>
+                <h6>Product Discount: {product.productDiscount}</h6>
+                <h6>Store Discount: {product.store.storeDiscount}</h6>
+                <h6>Store Name: {product.store.storeName}</h6>
+                <h6>Owner: {product.store.owner.username}</h6>
+                <img
+                  src={product.store.owner.profileImg}
+                  alt={product.store.owner.username}
+                  style={{ width: "100px", height: "100px" }}
+                />
+                <h6>Selling Price: {product.sellingPrice}</h6>
                 {userInfo?.user?.role === "User" && (
                   <>
                     <button
                       onClick={() => {
-                        onCartProductClick(product._id);
+                        onCartProductClick(product._id, product.sellingPrice);
                       }}
                     >
                       Cart
                     </button>
                     <button
                       onClick={() => {
-                        onBuyProductClick(product._id);
+                        onBuyProductClick(product._id, product.sellingPrice);
                       }}
                     >
                       Buy

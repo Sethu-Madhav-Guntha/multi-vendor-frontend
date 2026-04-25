@@ -1,8 +1,18 @@
 # multi-vendor-frontend
 Frontend Application Code for Multi-Vendor Web Application.
+Added Profile Image, Application Logo at Navbar component.
+Added Store Image at Outlet Details feature.
+Added Profile Image and Gender Fields at the Register Form page.
+Added Store Discount field to the Outlet Form at the Outlets page.
+Modified updateStore body at outletService.
+Added sellingPrice to the addToCart functionality at cartService.
+Modified getOrderById endpoint for getOrderById at orderService.
+Altered UI for Product Details.
+Current Version: 6.1.1
+-----------------------------------------------------------------
 Implemented Vendor Order Functionalities. 
 Added useEffect for fetching Customer Orders on rendering Order Page.
-Current Version: 6.1.0
+at this Version: 6.1.0
 -----------------------------------------------------------------
 Implemented Customer Order Functionalities.
 at this Version: 6.0.0

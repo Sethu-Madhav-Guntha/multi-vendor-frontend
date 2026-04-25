@@ -59,7 +59,8 @@ function Orders() {
 
   const onOrderDetailsClick = async (orderId) => {
     setSelectedOrder(orderId);
-    await getOrderDetailsFn({ orderId, token });
+    const orderDetials = await getOrderDetailsFn({ orderId, token });
+    console.log(orderDetials);
   };
 
   const onStoreSelectionChange = () => {
@@ -105,24 +106,45 @@ function Orders() {
                 <ul>
                   {order?.items?.map((item) => (
                     <li key={item._id}>
+                      <img
+                        src={item.product.productImageUrl}
+                        alt={item.product.productName}
+                      />
                       <h5>{item?.product?.productName}</h5>
                       <h6>Quantity: {item?.quantity}</h6>
-                    </li>
-                  ))}
-                  {selectedOrder === order._id && (
-                    <>
-                      <h5>Store Name: {order?.store?.storeName}</h5>
                       <h5>Total: {order?.totalAmount}</h5>
                       <h5>Status: {order?.status}</h5>
-                    </>
-                  )}
+                      {selectedOrder === order._id && (
+                        <>
+                          <h6>
+                            Product Discount: {item?.product?.productDiscount}
+                          </h6>
+                          <h6>
+                            Store Discount:{" "}
+                            {item?.product?.store?.storeDiscount}
+                          </h6>
+                          <h6>Store Name: {item?.product?.store?.storeName}</h6>
+                          <h6>Owner: {item?.product?.store?.owner.username}</h6>
+                          <img
+                            src={item?.product?.store?.owner.profileImg}
+                            alt={item?.product?.store?.owner.username}
+                            style={{ width: "100px", height: "100px" }}
+                          />
+                        </>
+                      )}
+                    </li>
+                  ))}
                 </ul>
-                <button
-                  onClick={() => onCancelOrderClick(order._id)}
-                  disabled={order?.status !== "Pending"}
-                >
-                  Cancel Order
-                </button>
+                {order?.status === "Pending" && (
+                  <>
+                    <button
+                      onClick={() => onCancelOrderClick(order._id)}
+                      disabled={order?.status !== "Pending"}
+                    >
+                      Cancel Order
+                    </button>
+                  </>
+                )}
                 <button
                   onClick={() => {
                     onOrderDetailsClick(order._id);
@@ -145,9 +167,7 @@ function Orders() {
             value={selectedStore}
             onChange={onStoreSelectionChange}
           >
-            <option value="All" selected>
-              All Stores
-            </option>
+            <option value="All">All Stores</option>
             {vendorOutlets?.storesList?.map((store) => (
               <option key={store._id} value={store._id}>
                 {store.storeName}
@@ -160,7 +180,6 @@ function Orders() {
               ? "All Stores"
               : selectedStore.storeName}
           </h1>
-          {console.log(ordersData)}
           <ul>
             {ordersData?.orders?.map((order) => (
               <li key={order._id}>
@@ -178,6 +197,12 @@ function Orders() {
                     <h6>Store: {order.store.storeName}</h6>
                     <span>Current Status: {order.status}</span>
                     <h5>Ordered By: {order.user.username}</h5>
+                    <img
+                      src={order.user.profileImg}
+                      alt={order.user.username}
+                      style={{ width: "100px", height: "100px" }}
+                    />
+                    <br />
                     <label htmlFor="updateStatusId">Update Status</label>
                     <select
                       id="updateStatusId"

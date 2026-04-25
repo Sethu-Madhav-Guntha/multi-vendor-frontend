@@ -9,7 +9,7 @@ export const outletApi = createApi({
     }),
     endpoints: (builder) => ({
         createOutlet: builder.mutation({
-            query: ({outletInfo, token}) => ({
+            query: ({ outletInfo, token }) => ({
                 url: "/create",
                 method: "POST",
                 headers: {
@@ -28,7 +28,7 @@ export const outletApi = createApi({
             })
         }),
         fetchOutletById: builder.query({
-            query: ({outletId, token}) => ({
+            query: ({ outletId, token }) => ({
                 url: `/${outletId}`,
                 method: "GET",
                 headers: {
@@ -37,17 +37,17 @@ export const outletApi = createApi({
             })
         }),
         updateOutlet: builder.mutation({
-            query: ({outletInfo, token}) => ({
+            query: ({ outletInfo, token }) => ({
                 url: `/${outletInfo._id}`,
                 method: "PUT",
                 headers: {
                     authorization: `Bearer ${token}`
                 },
-                body: { storeName: outletInfo.storeName, description: outletInfo.description }
+                body: outletInfo
             })
         }),
         removeOutlet: builder.mutation({
-            query: ({id, token}) => ({
+            query: ({ id, token }) => ({
                 url: `/${id}`,
                 method: "DELETE",
                 headers: {

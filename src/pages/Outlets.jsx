@@ -15,6 +15,8 @@ function Outlets() {
 
   const storeNameRef = useRef();
   const descriptionRef = useRef();
+  const storeImgRef = useRef();
+  const storeDiscountRef = useRef();
 
   const navigateFn = useNavigate();
   const token = useSelector((state) => state?.authReducer?.token);
@@ -28,6 +30,8 @@ function Outlets() {
   const onUpdateOutletClick = async (outlet) => {
     storeNameRef.current.value = outlet.storeName;
     descriptionRef.current.value = outlet.description;
+    storeImgRef.current.value = outlet.storeImg;
+    storeDiscountRef.current.value = outlet.storeDiscount;
     setOutletDetails(outlet);
     setEditFlag(true);
   };
@@ -79,6 +83,18 @@ function Outlets() {
           ref={descriptionRef}
         />
         <br />
+        <label htmlFor="outletImgId">Outlet Image URL:</label>
+        <input type="text" name="storeImg" id="outletImgId" placeholder="Provide Store Image URL Here" ref={storeImgRef} />
+        <br />
+        <label htmlFor="storeDiscountId">Store Discount: </label>
+        <input
+          type="number"
+          name="storeDiscount"
+          id="storeDiscountId"
+          defaultValue={0}
+          ref={storeDiscountRef}
+        />
+        <br />
         <button type="submit">{editFlag ? "Update" : "Create"} Outlet</button>
       </form>
 
@@ -89,7 +105,13 @@ function Outlets() {
           data?.storesList?.map((outlet) => (
             <li key={outlet._id}>
               <Link to={`/outlets/${outlet._id}`}>{outlet.storeName}</Link>
+              <img
+                src={outlet.storeImg}
+                alt={outlet.storeName}
+                style={{ width: "100px", height: "100px" }}
+              />
               <div>{outlet.description}</div>
+              <div>Store Discount: {outlet.storeDiscount}%</div>
               <button
                 onClick={() => {
                   onUpdateOutletClick(outlet);

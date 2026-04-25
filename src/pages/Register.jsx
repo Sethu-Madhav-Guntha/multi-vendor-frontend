@@ -64,6 +64,15 @@ function Register() {
         />
         <label htmlFor="userId">User</label>
         <br />
+        <span>Gender:</span>
+        <input type="radio" name="gender" value="Male" id="maleId" />
+        <label htmlFor="maleId">Male</label>
+        <input type="radio" name="gender" value="Female" id="femaleId" />
+        <label htmlFor="femaleId">Female</label>
+        <br />
+        <label htmlFor="profileImgId">Profile Image URL:</label>
+        <input type="text" name="profileImg" id="profileImgId" />
+        <br />
         <button type="submit">Register</button>
       </form>
     </div>

@@ -21,15 +21,16 @@ function OutletDetails() {
   const priceRef = useRef();
   const quantityRef = useRef();
   const productImageUrlRef = useRef();
+  const productDiscountRef = useRef();
 
   const { outletId } = useParams();
   const token = useSelector((state) => state?.authReducer?.token);
-  
+
   const [createProductFn] = useCreateProductMutation();
   const [updateProductFn] = useUpdateProductMutation();
   const [deleteProductFn] = useRemoveProductMutation();
 
-  const { data: storeDetails } = useFetchOutletByIdQuery({ outletId, token });
+  const { data: storeDetails } = useFetchOutletByIdQuery({ outletId, token });  
   const [fetchStoreDetailsFn] = useLazyFetchOutletByIdQuery();
 
   const onUpdateProductClick = (product) => {
@@ -40,6 +41,7 @@ function OutletDetails() {
     priceRef.current.value = product.price;
     quantityRef.current.value = product.quantity;
     productImageUrlRef.current.value = product.productImageUrl;
+    productDiscountRef.current.value = product.productDiscount;
   };
 
   const onDeleteProductClick = async (productId) => {
@@ -75,6 +77,11 @@ function OutletDetails() {
     <div>
       <Link to="/outlets">Outlet List</Link>
       <h1>Outlet Details</h1>
+      <img
+        src={storeDetails?.store?.storeImg}
+        alt={storeDetails?.store?.storeName}
+        style={{ width: "200px", height: "200px", borderRadius: "30px" }}
+      />
       <h2>Outlet: {storeDetails?.store?.storeName}</h2>
       <h3>Description: {storeDetails?.store?.description}</h3>
       <h2>{editProduct ? "Update" : "Create"} Product</h2>
@@ -123,6 +130,15 @@ function OutletDetails() {
           ref={productImageUrlRef}
         />
         <br />
+        <label htmlFor="productDiscountId">Product Discount:</label>
+        <input
+          type="number"
+          name="productDiscount"
+          id="productDiscountId"
+          defaultValue={0}
+          ref={productDiscountRef}
+        />
+        <br />
         <button type="submit">
           {editProduct ? "Update" : "Create"} Product
         </button>
@@ -139,6 +155,11 @@ function OutletDetails() {
             />
             <h5>Price: {product.price}</h5>
             <h6>Quantity: {product.quantity}</h6>
+            <h6>Product Discount: {product.productDiscount}</h6>
+            <h6>Store Discount: {product.store.storeDiscount}</h6>
+            <h6>Store Discount: {product.store.storeName}</h6>
+            <h6>Store Owner: {storeDetails.store.owner.username}</h6>
+            <h5>Selling Price: {product.sellingPrice}</h5>
             <button
               onClick={() => {
                 onUpdateProductClick(product);

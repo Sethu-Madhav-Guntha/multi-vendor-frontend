@@ -27,7 +27,13 @@ function Navbar() {
       <h1>Navbar Component</h1>
       <ul>
         <li>
-          <Link to="/">Home</Link>
+          <Link to="/">
+            <img
+              src="../mvlogo.png"
+              alt="App Logo"
+              style={{ width: "50px", height: "50px", borderRadius: "10px" }}
+            />
+          </Link>
         </li>
         {user?.username && (
           <>
@@ -46,6 +52,12 @@ function Navbar() {
             </li>
 
             <div>{user?.username}</div>
+            <img
+              src={user.profileImg}
+              alt={user.username}
+              style={{ width: "50px", height: "50px", borderRadius: "50%" }}
+            />
+            <br />
             <button onClick={onLogoutClick}>Log Out</button>
           </>
         )}

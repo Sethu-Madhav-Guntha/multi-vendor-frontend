@@ -50,6 +50,7 @@ function Cart() {
     const items = cartItems?.cart?.items?.map((item) => ({
       productId: item.product._id,
       quantity: item.quantity,
+      sellingPrice: item.product.sellingPrice
     }));
     await createOrderFn({ items, token });
     await onClearCartClick();
@@ -89,6 +90,10 @@ function Cart() {
                 alt={item.product.productName}
                 style={{ width: "200px", height: "200px" }}
               />
+              <h5>Product Discount: {item.product.productDiscount}</h5>
+              <h5>Store Discount: {item.product.store.storeDiscount}</h5>
+              <h5>Store Name: {item.product.store.storeName}</h5>
+              <h5>Store Owner: {item.product.store.owner.username}</h5>
               <br />
               <button
                 onClick={() => {
