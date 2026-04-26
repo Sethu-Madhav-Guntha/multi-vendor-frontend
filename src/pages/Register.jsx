@@ -1,12 +1,16 @@
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+
 import { useRegisterMutation } from "../features/auth/authService";
 import { setUserInfo } from "../features/auth/authSlice";
-import { useNavigate } from "react-router-dom";
+import { useNotifier } from "../hooks/useNotifier";
 
 function Register() {
   const [registerUserFn] = useRegisterMutation();
   const dispatchFn = useDispatch();
   const navigateFn = useNavigate();
+  const { notificationMsg } = useNotifier();
+
   const onRegisterFormSubmit = () => {
     event.preventDefault();
     const registerForm = new FormData(event.target);
@@ -14,15 +18,15 @@ function Register() {
 
     registerUserFn(registerFormData)
       .then((res) => {
-        console.log(res.data.message);
+        notificationMsg("success", res.data.message);
         dispatchFn(setUserInfo({ token: res.data.token, user: res.data.user }));
         navigateFn(res.data.redirect);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => notificationMsg("error", err.message));
   };
 
   return (
-    <div>
+    <>
       <h1>Register Page</h1>
       <form onSubmit={onRegisterFormSubmit}>
         <label htmlFor="usernameId">Enter Username:</label>
@@ -65,7 +69,7 @@ function Register() {
         <label htmlFor="userId">User</label>
         <br />
         <span>Gender:</span>
-        <input type="radio" name="gender" value="Male" id="maleId" />
+        <input type="radio" name="gender" value="Male" id="maleId" defaultChecked />
         <label htmlFor="maleId">Male</label>
         <input type="radio" name="gender" value="Female" id="femaleId" />
         <label htmlFor="femaleId">Female</label>
@@ -75,7 +79,7 @@ function Register() {
         <br />
         <button type="submit">Register</button>
       </form>
-    </div>
+    </>
   );
 }
 export default Register;

@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
 import {
   useFetchOutletByIdQuery,
@@ -8,9 +8,11 @@ import {
 } from "./outletService";
 import {
   useCreateProductMutation,
+  useLazyFetchProductByIdQuery,
   useRemoveProductMutation,
   useUpdateProductMutation,
 } from "../products/productService";
+import { useNotifier } from "../../hooks/useNotifier";
 
 function OutletDetails() {
   const [editProduct, setEditProduct] = useState(false);
@@ -29,9 +31,15 @@ function OutletDetails() {
   const [createProductFn] = useCreateProductMutation();
   const [updateProductFn] = useUpdateProductMutation();
   const [deleteProductFn] = useRemoveProductMutation();
+  const [fetchProductByIdFn] = useLazyFetchProductByIdQuery();
 
-  const { data: storeDetails } = useFetchOutletByIdQuery({ outletId, token });  
+  const { data: storeDetails } = useFetchOutletByIdQuery({ outletId, token });
   const [fetchStoreDetailsFn] = useLazyFetchOutletByIdQuery();
+  const { notificationMsg } = useNotifier();
+
+  useEffect(()=>{
+    notificationMsg("info", storeDetails?.message);
+  }, [storeDetails]);
 
   const onUpdateProductClick = (product) => {
     setEditProduct(true);
@@ -42,11 +50,18 @@ function OutletDetails() {
     quantityRef.current.value = product.quantity;
     productImageUrlRef.current.value = product.productImageUrl;
     productDiscountRef.current.value = product.productDiscount;
+    notificationMsg("warning", `Updating ${product.productName} Details.`);
   };
 
   const onDeleteProductClick = async (productId) => {
-    await deleteProductFn({ productId, token });
-    fetchStoreDetailsFn({ outletId, token });
+    try {
+      const product = await fetchProductByIdFn({productId, token});
+      await deleteProductFn({ productId, token });
+      notificationMsg("default", `${product.data.product.productName} Product Removed.`);
+      fetchStoreDetailsFn({ outletId, token });
+    } catch (err) {
+      notificationMsg("error", err.message);
+    }
   };
 
   const onProductDetailsSubmit = async () => {
@@ -55,7 +70,7 @@ function OutletDetails() {
     const productFormData = Object.fromEntries(productForm.entries());
     event.target.reset();
     if (editProduct) {
-      await updateProductFn({
+      const updatedProductDetails = await updateProductFn({
         productInfo: {
           _id: productInfo._id,
           ...productFormData,
@@ -63,12 +78,14 @@ function OutletDetails() {
         },
         token,
       });
+      notificationMsg("success", updatedProductDetails.data.message);
       setEditProduct(false);
     } else {
-      await createProductFn({
+      const createdProductDetials = await createProductFn({
         productInfo: { ...productFormData, storeId: outletId },
         token,
       });
+      notificationMsg("success", createdProductDetials.data.message);
     }
     fetchStoreDetailsFn({ outletId, token });
   };

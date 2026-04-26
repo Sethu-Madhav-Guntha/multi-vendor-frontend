@@ -1,33 +1,59 @@
 import { useSelector } from "react-redux";
+import { useEffect } from "react";
+
 import {
   useFetchAllProductsQuery,
   useLazyFetchAllProductsQuery,
 } from "../features/products/productService";
 import { useAddToCartMutation } from "../features/cart/cartService";
 import { useCreateOrderMutation } from "../features/order/orderService";
+import { useNotifier } from "../hooks/useNotifier";
 
 function Home() {
   const [addToCartFn] = useAddToCartMutation();
   const [createOrderFn] = useCreateOrderMutation();
-  const { data: allProducts } = useFetchAllProductsQuery();
+  const { data: allProductsInfo } = useFetchAllProductsQuery();
   const [fetchAllProductsFn] = useLazyFetchAllProductsQuery();
+
+  const { notificationMsg } = useNotifier();
+
   const userInfo = useSelector((state) => state?.authReducer);
 
+  useEffect(() => {
+    if (allProductsInfo?.message) {
+      notificationMsg("info", allProductsInfo?.message);
+    }
+  }, [allProductsInfo]);
+
   const onCartProductClick = async (productId, sellingPrice) => {
-    await addToCartFn({ productId, sellingPrice, token: userInfo?.token });
-    fetchAllProductsFn();
+    try {
+      const addProductToCartResut = await addToCartFn({
+        productId,
+        sellingPrice,
+        token: userInfo?.token,
+      });
+      notificationMsg("success", addProductToCartResut.data.message);
+      await fetchAllProductsFn();
+    } catch (err) {
+      notificationMsg("error", err.message);
+    }
   };
 
-  const onBuyProductClick = async (productId, sellingPrice) => {
-    await createOrderFn({
-      items: [{ productId, quantity: 1, sellingPrice }],
-      token: userInfo?.token,
-    });
-    fetchAllProductsFn();
+  const onBuyProductClick = async (product, sellingPrice) => {
+    try {
+      await createOrderFn({
+        items: [{ productId: product._id, quantity: 1, sellingPrice }],
+        token: userInfo?.token,
+      });
+      notificationMsg("success", `${product.productName} has been placed Order.`);
+      fetchAllProductsFn();
+    } catch (err) {
+      notificationMsg("error", err.message);
+    }
   };
 
   return (
-    <div>
+    <>
       <h1>Home Page</h1>
       {userInfo?.user?.role === "Vendor" && (
         <>
@@ -37,7 +63,7 @@ function Home() {
       {(!userInfo || !(userInfo?.user?.role === "Vendor")) && (
         <>
           <ul>
-            {allProducts?.products?.map((product) => (
+            {allProductsInfo?.products?.map((product) => (
               <li key={product._id}>
                 <h4>{product.productName}</h4>
                 <img
@@ -68,7 +94,7 @@ function Home() {
                     </button>
                     <button
                       onClick={() => {
-                        onBuyProductClick(product._id, product.sellingPrice);
+                        onBuyProductClick(product, product.sellingPrice);
                       }}
                     >
                       Buy
@@ -80,7 +106,7 @@ function Home() {
           </ul>
         </>
       )}
-    </div>
+    </>
   );
 }
 export default Home;

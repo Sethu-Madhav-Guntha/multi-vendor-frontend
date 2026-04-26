@@ -1,15 +1,19 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { setUserInfo, logout } from "../features/auth/authSlice";
 import { useEffect } from "react";
+
+import { setUserInfo, logout } from "../features/auth/authSlice";
 import { useUserDetailsQuery } from "../features/auth/authService";
+import { useNotifier } from "../hooks/useNotifier";
 
 function Navbar() {
   const dispatchFn = useDispatch();
   const navigateFn = useNavigate();
+
   let user = useSelector((state) => state?.authReducer?.user);
   const token = localStorage.getItem("token");
   const { data } = useUserDetailsQuery(token, { skip: !token });
+  const { notificationMsg } = useNotifier();
 
   useEffect(() => {
     if (token) {
@@ -18,13 +22,17 @@ function Navbar() {
   }, [data]);
 
   const onLogoutClick = () => {
-    dispatchFn(logout());
-    navigateFn("/");
+    try {
+      dispatchFn(logout());
+      notificationMsg("default", `Logged Out.`)
+      navigateFn("/");
+    } catch (err) {
+      notificationMsg("error", err.message);
+    }
   };
 
   return (
-    <div>
-      <h1>Navbar Component</h1>
+    <>
       <ul>
         <li>
           <Link to="/">
@@ -72,7 +80,7 @@ function Navbar() {
           </>
         )}
       </ul>
-    </div>
+    </>
   );
 }
 export default Navbar;

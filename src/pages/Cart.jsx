@@ -1,4 +1,6 @@
 import { useSelector } from "react-redux";
+import { useEffect } from "react";
+
 import {
   useAddToCartMutation,
   useCartItemsQuery,
@@ -6,63 +8,94 @@ import {
   useLazyCartItemsQuery,
   useRemoveItemMutation,
 } from "../features/cart/cartService";
-import { useEffect } from "react";
 import { useCreateOrderMutation } from "../features/order/orderService";
+import { useNotifier } from "../hooks/useNotifier";
 
 function Cart() {
   const token = useSelector((state) => state?.authReducer?.token);
-  const { data: cartItems, refetch } = useCartItemsQuery({ token });
+
+  const { data: cartItems, refetch: refetchCartItems } = useCartItemsQuery({
+    token,
+  });
   const [fetchCartItemsFn] = useLazyCartItemsQuery();
   const [removeCartItemFn] = useRemoveItemMutation();
   const [clearCartFn] = useClearCartMutation();
   const [addToCartFn] = useAddToCartMutation();
   const [createOrderFn] = useCreateOrderMutation();
 
+  const { notificationMsg } = useNotifier();
+
   const onIncrementItemClick = async (item) => {
-    await addToCartFn({ productId: item.product._id, token });
-    fetchCartItemsFn({ token });
+    try {
+      await addToCartFn({ productId: item.product._id, token });
+      fetchCartItemsFn({ token });
+    } catch (err) {
+      notificationMsg("error", err.message);
+    }
   };
 
   const onDecrementItemClick = async (item) => {
-    await removeCartItemFn({
-      productId: item.product._id,
-      token,
-      removeAll: false,
-    });
-    fetchCartItemsFn({ token });
+    try {
+      await removeCartItemFn({
+        productId: item.product._id,
+        token,
+        removeAll: false,
+      });
+      fetchCartItemsFn({ token });
+    } catch (err) {
+      notificationMsg("error", err.message);
+    }
   };
 
   const onRemoveItemClick = async (item) => {
-    await removeCartItemFn({
-      productId: item.product._id,
-      token,
-      removeAll: true,
-    });
-    fetchCartItemsFn({ token });
+    try {
+      await removeCartItemFn({
+        productId: item.product._id,
+        token,
+        removeAll: true,
+      });
+      notificationMsg(
+        "default",
+        `${item.product.productName} Removed from Cart.`,
+      );
+      fetchCartItemsFn({ token });
+    } catch (err) {
+      notificationMsg("error", err.message);
+    }
   };
 
   const onClearCartClick = async () => {
-    await clearCartFn({ token });
-    fetchCartItemsFn({ token });
+    try {
+      await clearCartFn({ token });
+      notificationMsg("default", "Removed all items from Cart.");
+      fetchCartItemsFn({ token });
+    } catch (err) {
+      notificationMsg("error", err.message);
+    }
   };
 
   const onBuyNowClick = async () => {
-    const items = cartItems?.cart?.items?.map((item) => ({
-      productId: item.product._id,
-      quantity: item.quantity,
-      sellingPrice: item.product.sellingPrice
-    }));
-    await createOrderFn({ items, token });
-    await onClearCartClick();
-    console.log("Buying Cart Items");
+    try {
+      const items = cartItems?.cart?.items?.map((item) => ({
+        productId: item.product._id,
+        quantity: item.quantity,
+        sellingPrice: item.product.sellingPrice,
+      }));
+      await createOrderFn({ items, token });
+      notificationMsg("success", "Cart Items have placed Order.");
+      await onClearCartClick();
+    } catch (err) {
+      notificationMsg("error", err.message);
+    }
   };
 
   useEffect(() => {
-    refetch();
-  }, []);
+    refetchCartItems();
+    notificationMsg("info", cartItems?.message);
+  }, [cartItems]);
 
   return (
-    <div>
+    <>
       <h1>Cart Page</h1>
       <h2>Products added to Cart</h2>
       {cartItems?.cart?.items.length > 0 && (
@@ -119,7 +152,7 @@ function Cart() {
             </li>
           ))}
       </ul>
-    </div>
+    </>
   );
 }
 export default Cart;

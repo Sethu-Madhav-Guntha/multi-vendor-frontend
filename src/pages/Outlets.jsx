@@ -1,13 +1,16 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+
 import {
   useCreateOutletMutation,
+  useLazyFetchOutletByIdQuery,
   useFetchOutletsQuery,
   useLazyFetchOutletsQuery,
   useRemoveOutletMutation,
   useUpdateOutletMutation,
 } from "../features/outlet/outletService";
-import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useNotifier } from "../hooks/useNotifier";
 
 function Outlets() {
   const [editFlag, setEditFlag] = useState(false);
@@ -18,28 +21,46 @@ function Outlets() {
   const storeImgRef = useRef();
   const storeDiscountRef = useRef();
 
-  const navigateFn = useNavigate();
   const token = useSelector((state) => state?.authReducer?.token);
+  const { notificationMsg } = useNotifier();
 
   const [createOutletFn] = useCreateOutletMutation();
   const [updateOutletFn] = useUpdateOutletMutation();
   const [removeOutletFn] = useRemoveOutletMutation();
   const [fetchOutletsFn] = useLazyFetchOutletsQuery();
-  const { data } = useFetchOutletsQuery(token);
+  const [fetchOutletByIdFn] = useLazyFetchOutletByIdQuery();
+  const { data: vendorOutletsData } = useFetchOutletsQuery(token);
 
-  const onUpdateOutletClick = async (outlet) => {
-    storeNameRef.current.value = outlet.storeName;
-    descriptionRef.current.value = outlet.description;
-    storeImgRef.current.value = outlet.storeImg;
-    storeDiscountRef.current.value = outlet.storeDiscount;
-    setOutletDetails(outlet);
-    setEditFlag(true);
+  useEffect(() => {
+    notificationMsg("info", vendorOutletsData?.message);
+  }, [vendorOutletsData]);
+
+  const onUpdateOutletClick = (outlet) => {
+    try {
+      storeNameRef.current.value = outlet.storeName;
+      descriptionRef.current.value = outlet.description;
+      storeImgRef.current.value = outlet.storeImg;
+      storeDiscountRef.current.value = outlet.storeDiscount;
+      setOutletDetails(outlet);
+      setEditFlag(true);
+      notificationMsg("warning", `updating ${outlet.storeName} details`);
+    } catch (err) {
+      notificationMsg("error", err.message);
+    }
   };
 
   const onRemoveOutletClick = async (outletId) => {
-    await removeOutletFn({ id: outletId, token });
-    navigateFn("/outlets");
-    fetchOutletsFn(token);
+    try {
+      const outletDetailsData = await fetchOutletByIdFn({ outletId, token });
+      await removeOutletFn({ id: outletId, token });
+      notificationMsg(
+        "default",
+        `${outletDetailsData.data.store.storeName} & it's Products were Removed`,
+      );
+      await fetchOutletsFn(token);
+    } catch (err) {
+      notificationMsg("error", err.message);
+    }
   };
 
   const onOutletDetailsSubmit = async () => {
@@ -48,7 +69,7 @@ function Outlets() {
     const outletFormData = Object.fromEntries(outletForm.entries());
     event.target.reset();
     if (editFlag) {
-      await updateOutletFn({
+      const updateOutletData = await updateOutletFn({
         outletInfo: {
           _id: outletDetails._id,
           ...outletFormData,
@@ -56,14 +77,19 @@ function Outlets() {
         token,
       });
       setEditFlag(false);
+      notificationMsg("success", updateOutletData.data.message);
     } else {
-      await createOutletFn({ outletInfo: outletFormData, token });
+      const createdOutletData = await createOutletFn({
+        outletInfo: outletFormData,
+        token,
+      });
+      notificationMsg("success", createdOutletData.data.message);
     }
-    fetchOutletsFn(token);
+    await fetchOutletsFn(token);
   };
 
   return (
-    <div>
+    <>
       <h1>Outlets Page</h1>
       <form onSubmit={onOutletDetailsSubmit}>
         <label htmlFor="storeNameId">Enter Store Name:</label>
@@ -84,7 +110,13 @@ function Outlets() {
         />
         <br />
         <label htmlFor="outletImgId">Outlet Image URL:</label>
-        <input type="text" name="storeImg" id="outletImgId" placeholder="Provide Store Image URL Here" ref={storeImgRef} />
+        <input
+          type="text"
+          name="storeImg"
+          id="outletImgId"
+          placeholder="Provide Store Image URL Here"
+          ref={storeImgRef}
+        />
         <br />
         <label htmlFor="storeDiscountId">Store Discount: </label>
         <input
@@ -101,8 +133,8 @@ function Outlets() {
       <h2>Outlet List:</h2>
 
       <ul>
-        {data &&
-          data?.storesList?.map((outlet) => (
+        {vendorOutletsData &&
+          vendorOutletsData?.storesList?.map((outlet) => (
             <li key={outlet._id}>
               <Link to={`/outlets/${outlet._id}`}>{outlet.storeName}</Link>
               <img
@@ -129,7 +161,7 @@ function Outlets() {
             </li>
           ))}
       </ul>
-    </div>
+    </>
   );
 }
 export default Outlets;

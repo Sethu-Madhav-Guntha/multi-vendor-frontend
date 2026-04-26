@@ -1,4 +1,7 @@
 import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { skipToken } from "@reduxjs/toolkit/query";
+
 import {
   useCancelOrderMutation,
   useGetCustomerOrdersQuery,
@@ -10,9 +13,8 @@ import {
   useUpdateOrderMutation,
   useVendorOrdersQuery,
 } from "../features/order/orderService";
-import { useEffect, useState } from "react";
 import { useFetchOutletsQuery } from "../features/outlet/outletService";
-import { skipToken } from "@reduxjs/toolkit/query";
+import { useNotifier } from "../hooks/useNotifier";
 
 function Orders() {
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -38,29 +40,40 @@ function Orders() {
       : skipToken,
   );
   const [listStoreOrdersFn] = useLazyListStoreOrdersQuery();
-
   const { data: vendorOrders } = useVendorOrdersQuery(
     selectedStore.storeId === "All" ? { token } : skipToken,
   );
   const [listVendorOrdersFn] = useLazyVendorOrdersQuery();
-
   const { data: vendorOutlets } = useFetchOutletsQuery(token);
-
   const [updateOrderStatusFn] = useUpdateOrderMutation();
+
+  const { notificationMsg } = useNotifier();
 
   useEffect(() => {
     getCustomerOrdersFn({ token });
+    notificationMsg("info", "Orders Fetched.");
   }, []);
 
-  const onCancelOrderClick = async (orderId) => {
-    await cancelOrderFn({ orderId, token });
-    getCustomerOrdersFn({ token });
+  const onCancelOrderClick = async (order) => {
+    try {
+      await cancelOrderFn({ orderId: order._id, token });
+      notificationMsg(
+        "warning",
+        `${order.items[0].product.productName} has been canceled.`,
+      );
+      getCustomerOrdersFn({ token });
+    } catch (err) {
+      notificationMsg("error", err.message);
+    }
   };
 
   const onOrderDetailsClick = async (orderId) => {
-    setSelectedOrder(orderId);
-    const orderDetials = await getOrderDetailsFn({ orderId, token });
-    console.log(orderDetials);
+    try {
+      setSelectedOrder(orderId);
+      await getOrderDetailsFn({ orderId, token });
+    } catch (err) {
+      notificationMsg("error", err.message);
+    }
   };
 
   const onStoreSelectionChange = () => {
@@ -68,30 +81,43 @@ function Orders() {
       storeId: event.target.value,
       storeName: event.target.options[event.target.selectedIndex].text,
     });
+    notificationMsg("info", `${event.target.options[event.target.selectedIndex].text} Orders Fetched.`);
   };
 
-  const onStatusChange = async (orderId, newStatus) => {
-    await updateOrderStatusFn({ orderId, status: newStatus, token });
-    if (selectedStore.storeId === "All") {
-      listVendorOrdersFn(
-        selectedStore.storeId === "All" ? { token } : skipToken,
+  const onStatusChange = async (order, newStatus) => {
+    try {
+      await updateOrderStatusFn({
+        orderId: order._id,
+        status: newStatus,
+        token,
+      });
+      if (selectedStore.storeId === "All") {
+        listVendorOrdersFn(
+          selectedStore.storeId === "All" ? { token } : skipToken,
+        );
+      } else {
+        listStoreOrdersFn(
+          selectedStore.storeId !== "All"
+            ? {
+                storeId: selectedStore.storeId,
+                token,
+              }
+            : skipToken,
+        );
+      }
+      notificationMsg(
+        "info",
+        `${order.items[0].product.productName} Order Updated.`,
       );
-    } else {
-      listStoreOrdersFn(
-        selectedStore.storeId !== "All"
-          ? {
-              storeId: selectedStore.storeId,
-              token,
-            }
-          : skipToken,
-      );
+    } catch (err) {
+      notificationMsg("error", err.message);
     }
   };
 
   let ordersData = selectedStore.storeId === "All" ? vendorOrders : storeOrders;
 
   return (
-    <div>
+    <>
       <h1>Orders Page</h1>
       {userRole === "User" && (
         <>
@@ -138,7 +164,7 @@ function Orders() {
                 {order?.status === "Pending" && (
                   <>
                     <button
-                      onClick={() => onCancelOrderClick(order._id)}
+                      onClick={() => onCancelOrderClick(order)}
                       disabled={order?.status !== "Pending"}
                     >
                       Cancel Order
@@ -164,7 +190,7 @@ function Orders() {
           <select
             name="outlet"
             id="outletId"
-            value={selectedStore}
+            value={selectedStore.storeId}
             onChange={onStoreSelectionChange}
           >
             <option value="All">All Stores</option>
@@ -207,9 +233,7 @@ function Orders() {
                     <select
                       id="updateStatusId"
                       value={order.status}
-                      onChange={(e) =>
-                        onStatusChange(order._id, e.target.value)
-                      }
+                      onChange={(e) => onStatusChange(order, e.target.value)}
                     >
                       <option value="Pending">Pending</option>
                       <option value="Accepted">Accepted</option>
@@ -231,7 +255,7 @@ function Orders() {
           </ul>
         </>
       )}
-    </div>
+    </>
   );
 }
 export default Orders;
