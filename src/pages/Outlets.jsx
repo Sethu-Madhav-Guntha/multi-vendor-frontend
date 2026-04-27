@@ -49,13 +49,12 @@ function Outlets() {
     }
   };
 
-  const onRemoveOutletClick = async (outletId) => {
+  const onRemoveOutletClick = async (outlet) => {
     try {
-      const outletDetailsData = await fetchOutletByIdFn({ outletId, token });
-      await removeOutletFn({ id: outletId, token });
+      await removeOutletFn({ id: outlet._id, token });
       notificationMsg(
         "default",
-        `${outletDetailsData.data.store.storeName} & it's Products were Removed`,
+        `${outlet.storeName} & it's Products were Removed`,
       );
       await fetchOutletsFn(token);
     } catch (err) {
@@ -153,7 +152,7 @@ function Outlets() {
               </button>
               <button
                 onClick={() => {
-                  onRemoveOutletClick(outlet._id);
+                  onRemoveOutletClick(outlet);
                 }}
               >
                 Remove

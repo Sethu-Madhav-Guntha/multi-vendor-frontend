@@ -81,7 +81,10 @@ function Orders() {
       storeId: event.target.value,
       storeName: event.target.options[event.target.selectedIndex].text,
     });
-    notificationMsg("info", `${event.target.options[event.target.selectedIndex].text} Orders Fetched.`);
+    notificationMsg(
+      "info",
+      `${event.target.options[event.target.selectedIndex].text} Orders Fetched.`,
+    );
   };
 
   const onStatusChange = async (order, newStatus) => {

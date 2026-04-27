@@ -1,7 +1,11 @@
 # multi-vendor-frontend
 Frontend Application Code for Multi-Vendor Web Application.
+Created Home folder for VendorDashboard & Unauthorized or User home.
+Altered as per Store Deletion functionality.
+Current Version: 6.1.3
+-----------------------------------------------------------------
 Implemented Notification using Notistack library.
-Current Version: 6.1.2
+at this Version: 6.1.2
 -----------------------------------------------------------------
 Added Profile Image, Application Logo at Navbar component.
 Added Store Image at Outlet Details feature.
