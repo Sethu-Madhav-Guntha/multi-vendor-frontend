@@ -1,8 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const setTokenAtLocalStorage = (token) => {
-    localStorage.setItem("token", token);
-}
+import { clearToken, setToken } from "../../utils/tokenStorage";
 
 export const authSlice = createSlice({
     name: "authenticationSlice",
@@ -15,12 +13,12 @@ export const authSlice = createSlice({
             const { user, token } = action.payload;
             state.user = user;
             state.token = token;
-            setTokenAtLocalStorage(token);
+            setToken(token);
         },
         logout: (state) => {
             state.user = null;
             state.token = null;
-            localStorage.clear();
+            clearToken();
         },
     },
 });

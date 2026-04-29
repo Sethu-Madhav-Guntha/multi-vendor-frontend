@@ -1,10 +1,15 @@
 # multi-vendor-frontend
 Frontend Application Code for Multi-Vendor Web Application.
+Navbar has been designed & useAuthNavbar custom hook is created.
+token is being modified through utility functions.
+Static footer section is generated.
+Current Version: 6.1.6
+-----------------------------------------------------------------
 Routes are Centralized at app folder.
 API Service names are replaced with xxxxApi instead of xxxxReducer.
 Implemented prepareHeaders at API Services, to include headers at time of base url.
 Initialised Bootstrap CDN Links at HTML file.
-Current Version: 6.1.5
+at this Version: 6.1.5
 -----------------------------------------------------------------
 Organised Centralized Store files with Root Reducers & Middlewares, listeners separately.
 skipToken is implemented at Navbar component.

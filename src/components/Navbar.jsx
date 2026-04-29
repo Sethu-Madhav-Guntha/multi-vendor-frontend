@@ -1,87 +1,174 @@
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+
+import { useAuthNavbar } from "../hooks/useAuthNavbar";
 import { useEffect } from "react";
 
-import { setUserInfo, logout } from "../features/auth/authSlice";
-import { useUserDetailsQuery } from "../features/auth/authService";
-import { useNotifier } from "../hooks/useNotifier";
-import { skipToken } from "@reduxjs/toolkit/query";
-
 function Navbar() {
-  const dispatchFn = useDispatch();
-  const navigateFn = useNavigate();
+  const { userInfo, isVendor, isUser, isAuthenticated, onLogoutClick } =
+    useAuthNavbar();
 
-  let user = useSelector((state) => state?.authReducer?.user);
-  const token = localStorage.getItem("token");
-  const { data } = useUserDetailsQuery(token ? token : skipToken);
-  const { notificationMsg } = useNotifier();
-
-  useEffect(() => {
-    if (token) {
-      dispatchFn(setUserInfo({ token, user: data?.user }));
-    }
-  }, [data]);
-
-  const onLogoutClick = () => {
-    try {
-      dispatchFn(logout());
-      notificationMsg("default", `Logged Out.`);
-      navigateFn("/");
-    } catch (err) {
-      notificationMsg("error", err.message);
+  // Helper to close the mobile menu
+  const closeNavCollapse = () => {
+    const navCollapse = document.getElementById("navbarNav");
+    if (navCollapse) {
+      navCollapse.classList.remove("show");
     }
   };
 
-  return (
-    <>
-      <ul>
-        <li>
-          <Link to="/">
-            <img
-              src="../mvlogo.png"
-              alt="App Logo"
-              style={{ width: "50px", height: "50px", borderRadius: "10px" }}
-            />
-          </Link>
-        </li>
-        {user?.username && (
-          <>
-            {user?.role === "Vendor" && (
-              <li>
-                <Link to="/outlets">Outlets</Link>
-              </li>
-            )}
-            {user?.role === "User" && (
-              <li>
-                <Link to="/cart">Cart</Link>
-              </li>
-            )}
-            <li>
-              <Link to="/orders">Orders</Link>
-            </li>
+  // Close toggler when focus is lost (click outside entire navbar)
+  const handleDocumentClick = (e) => {
+    const navCollapse = document.getElementById("navbarNav");
+    const toggler = document.querySelector(".navbar-toggler");
+    if (
+      navCollapse &&
+      navCollapse.classList.contains("show") &&
+      !navCollapse.contains(e.target) &&
+      !toggler.contains(e.target)
+    ) {
+      navCollapse.classList.remove("show");
+    }
+  };
 
-            <div>{user?.username}</div>
-            <img
-              src={user.profileImg}
-              alt={user.username}
-              style={{ width: "50px", height: "50px", borderRadius: "50%" }}
-            />
-            <br />
-            <button onClick={onLogoutClick}>Log Out</button>
-          </>
-        )}
-        {!user?.username && (
-          <>
-            <li>
-              <Link to="/login">Login</Link>
-            </li>
-            <li>
-              <Link to="/register">Register</Link>
-            </li>
-          </>
-        )}
-      </ul>
-    </>
+  // Attach global click listener once
+  useEffect(() => {
+    document.addEventListener("click", handleDocumentClick);
+    return () => {
+      document.removeEventListener("click", handleDocumentClick);
+    };
+  }, []);
+
+  // Wrap logout to also reset toggler
+  const handleLogout = () => {
+    closeNavCollapse();
+    onLogoutClick();
+  };
+
+  return (
+    <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div className="container-fluid">
+        {/* Brand Logo */}
+        <Link
+          className="navbar-brand d-flex align-items-center"
+          to="/"
+          onClick={closeNavCollapse}
+        >
+          <img
+            src="/mvlogo.png"
+            alt="App Logo"
+            className="rounded me-2"
+            style={{ width: "40px", height: "40px" }}
+          />
+          MultiVendor
+        </Link>
+
+        {/* Mobile Toggler */}
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+
+        {/* Collapsible Nav Links */}
+        <div className="collapse navbar-collapse" id="navbarNav">
+          <ul className="navbar-nav ms-auto">
+            {isAuthenticated ? (
+              <>
+                {isVendor && (
+                  <li className="nav-item">
+                    <Link
+                      className="nav-link"
+                      to="/outlets"
+                      onClick={closeNavCollapse}
+                    >
+                      Outlets
+                    </Link>
+                  </li>
+                )}
+                {isUser && (
+                  <li className="nav-item">
+                    <Link
+                      className="nav-link"
+                      to="/cart"
+                      onClick={closeNavCollapse}
+                    >
+                      Cart
+                    </Link>
+                  </li>
+                )}
+                <li className="nav-item">
+                  <Link
+                    className="nav-link"
+                    to="/orders"
+                    onClick={closeNavCollapse}
+                  >
+                    Orders
+                  </Link>
+                </li>
+
+                {/* User Profile Dropdown */}
+                <li className="nav-item dropdown">
+                  <img
+                    src={userInfo?.profileImg}
+                    alt={userInfo?.username}
+                    className="rounded-circle dropdown-toggle"
+                    style={{ width: "40px", height: "40px", cursor: "pointer" }}
+                    id="userDropdown"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  />
+                  <ul
+                    className="dropdown-menu dropdown-menu-end"
+                    aria-labelledby="userDropdown"
+                  >
+                    <li>
+                      <span className="dropdown-item-text">
+                        {userInfo?.username}
+                      </span>
+                    </li>
+                    <li>
+                      <hr className="dropdown-divider" />
+                    </li>
+                    <li>
+                      <button className="dropdown-item" onClick={handleLogout}>
+                        Log Out
+                      </button>
+                    </li>
+                  </ul>
+                </li>
+              </>
+            ) : (
+              <>
+                <li className="nav-item">
+                  <Link
+                    className="nav-link"
+                    to="/login"
+                    onClick={closeNavCollapse}
+                  >
+                    Login
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link
+                    className="nav-link"
+                    to="/register"
+                    onClick={closeNavCollapse}
+                  >
+                    Register
+                  </Link>
+                </li>
+              </>
+            )}
+          </ul>
+        </div>
+      </div>
+    </nav>
   );
 }
+
 export default Navbar;
