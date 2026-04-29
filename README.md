@@ -1,8 +1,12 @@
 # multi-vendor-frontend
 Frontend Application Code for Multi-Vendor Web Application.
+Organised Centralized Store files with Root Reducers & Middlewares, listeners separately.
+skipToken is implemented at Navbar component.
+Current Version: 6.1.4
+-----------------------------------------------------------------
 Created Home folder for VendorDashboard & Unauthorized or User home.
 Altered as per Store Deletion functionality.
-Current Version: 6.1.3
+at this Version: 6.1.3
 -----------------------------------------------------------------
 Implemented Notification using Notistack library.
 at this Version: 6.1.2

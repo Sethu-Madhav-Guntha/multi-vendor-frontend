@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { setUserInfo, logout } from "../features/auth/authSlice";
 import { useUserDetailsQuery } from "../features/auth/authService";
 import { useNotifier } from "../hooks/useNotifier";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 function Navbar() {
   const dispatchFn = useDispatch();
@@ -12,7 +13,7 @@ function Navbar() {
 
   let user = useSelector((state) => state?.authReducer?.user);
   const token = localStorage.getItem("token");
-  const { data } = useUserDetailsQuery(token, { skip: !token });
+  const { data } = useUserDetailsQuery(token ? token : skipToken);
   const { notificationMsg } = useNotifier();
 
   useEffect(() => {
@@ -24,7 +25,7 @@ function Navbar() {
   const onLogoutClick = () => {
     try {
       dispatchFn(logout());
-      notificationMsg("default", `Logged Out.`)
+      notificationMsg("default", `Logged Out.`);
       navigateFn("/");
     } catch (err) {
       notificationMsg("error", err.message);
