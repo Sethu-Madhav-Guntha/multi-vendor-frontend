@@ -1,75 +1,63 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+import { selectIsAuthenticatedUser, selectToken } from "../auth/authSelectors";
+
 const BASE_URI = import.meta.env.VITE_BACKEND_BASE_URI;
 
 export const orderApi = createApi({
-    reducerPath: "orderReducer",
+    reducerPath: "orderApi",
     baseQuery: fetchBaseQuery({
         baseUrl: `${BASE_URI}/orders`,
+        prepareHeaders: (headers, { getState }) => {
+            if (selectIsAuthenticatedUser(getState())) {
+                const token = selectToken(getState());
+                headers.set("authorization", `Bearer ${token}`);
+            }
+            return headers;
+        }
     }),
     endpoints: (builder) => ({
         createOrder: builder.mutation({
-            query: ({ items, token }) => ({
+            query: ({ items }) => ({
                 url: `/customer/create`,
                 method: "POST",
-                headers: {
-                    authorization: `Bearer ${token}`
-                },
                 body: items
             })
         }),
         getCustomerOrders: builder.query({
-            query: ({ token }) => ({
+            query: () => ({
                 url: `/customer`,
-                method: "GET",
-                headers: {
-                    authorization: `Bearer ${token}`
-                }
+                method: "GET"
             })
         }),
         getOrderById: builder.query({
-            query: ({ orderId, token }) => ({
+            query: ({ orderId }) => ({
                 url: `/${orderId}`,
-                method: "GET",
-                headers: {
-                    authorization: `Bearer ${token}`
-                }
+                method: "GET"
             })
         }),
         cancelOrder: builder.mutation({
-            query: ({ orderId, token }) => ({
+            query: ({ orderId }) => ({
                 url: `/customer/${orderId}`,
-                method: "DELETE",
-                headers: {
-                    authorization: `Bearer ${token}`
-                }
+                method: "DELETE"
             })
         }),
         listStoreOrders: builder.query({
-            query: ({ storeId, token }) => ({
+            query: ({ storeId }) => ({
                 url: `/store/${storeId}`,
-                method: "GET",
-                headers: {
-                    authorization: `Bearer ${token}`
-                }
+                method: "GET"
             })
         }),
         vendorOrders: builder.query({
-            query: ({ token }) => ({
+            query: () => ({
                 url: `/vendor`,
-                method: "GET",
-                headers: {
-                    authorization: `Bearer ${token}`
-                }
+                method: "GET"
             })
         }),
         updateOrder: builder.mutation({
-            query: ({ orderId, status, token }) => ({
+            query: ({ orderId, status }) => ({
                 url: `/vendor/${orderId}`,
                 method: "PUT",
-                headers: {
-                    authorization: `Bearer ${token}`
-                },
                 body: {
                     status
                 }

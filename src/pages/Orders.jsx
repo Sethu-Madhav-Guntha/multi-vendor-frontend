@@ -23,10 +23,9 @@ function Orders() {
     storeName: "All Stores",
   });
 
-  const token = useSelector((state) => state?.authReducer?.token);
   const userRole = useSelector((state) => state?.authReducer?.user?.role);
 
-  const { data: customerOrders } = useGetCustomerOrdersQuery({ token });
+  const { data: customerOrders } = useGetCustomerOrdersQuery();
   const [getCustomerOrdersFn] = useLazyGetCustomerOrdersQuery();
   const [cancelOrderFn] = useCancelOrderMutation();
   const [getOrderDetailsFn] = useLazyGetOrderByIdQuery();
@@ -35,33 +34,32 @@ function Orders() {
     selectedStore.storeId !== "All"
       ? {
           storeId: selectedStore.storeId,
-          token,
         }
       : skipToken,
   );
   const [listStoreOrdersFn] = useLazyListStoreOrdersQuery();
   const { data: vendorOrders } = useVendorOrdersQuery(
-    selectedStore.storeId === "All" ? { token } : skipToken,
+    selectedStore.storeId === "All" ? "" : skipToken,
   );
   const [listVendorOrdersFn] = useLazyVendorOrdersQuery();
-  const { data: vendorOutlets } = useFetchOutletsQuery(token);
+  const { data: vendorOutlets } = useFetchOutletsQuery();
   const [updateOrderStatusFn] = useUpdateOrderMutation();
 
   const { notificationMsg } = useNotifier();
 
   useEffect(() => {
-    getCustomerOrdersFn({ token });
+    getCustomerOrdersFn();
     notificationMsg("info", "Orders Fetched.");
   }, []);
 
   const onCancelOrderClick = async (order) => {
     try {
-      await cancelOrderFn({ orderId: order._id, token });
+      await cancelOrderFn({ orderId: order._id });
       notificationMsg(
         "warning",
         `${order.items[0].product.productName} has been canceled.`,
       );
-      getCustomerOrdersFn({ token });
+      getCustomerOrdersFn();
     } catch (err) {
       notificationMsg("error", err.message);
     }
@@ -70,7 +68,7 @@ function Orders() {
   const onOrderDetailsClick = async (orderId) => {
     try {
       setSelectedOrder(orderId);
-      await getOrderDetailsFn({ orderId, token });
+      await getOrderDetailsFn({ orderId });
     } catch (err) {
       notificationMsg("error", err.message);
     }
@@ -91,19 +89,17 @@ function Orders() {
     try {
       await updateOrderStatusFn({
         orderId: order._id,
-        status: newStatus,
-        token,
+        status: newStatus
       });
       if (selectedStore.storeId === "All") {
         listVendorOrdersFn(
-          selectedStore.storeId === "All" ? { token } : skipToken,
+          selectedStore.storeId === "All" ? "" : skipToken,
         );
       } else {
         listStoreOrdersFn(
           selectedStore.storeId !== "All"
             ? {
                 storeId: selectedStore.storeId,
-                token,
               }
             : skipToken,
         );
@@ -136,8 +132,8 @@ function Orders() {
                   {order?.items?.map((item) => (
                     <li key={item._id}>
                       <img
-                        src={item.product.productImageUrl}
-                        alt={item.product.productName}
+                        src={item.product?.productImageUrl}
+                        alt={item.product?.productName}
                       />
                       <h5>{item?.product?.productName}</h5>
                       <h6>Quantity: {item?.quantity}</h6>
@@ -215,7 +211,7 @@ function Orders() {
                 <ul>
                   {order?.items?.map((item) => (
                     <li key={item._id}>
-                      <h4>Item: {item.product.productName}</h4>
+                      <h4>Item: {item?.product?.productName}</h4>
                       <h5>Quantity: {item.quantity}</h5>
                       <h6></h6>
                     </li>

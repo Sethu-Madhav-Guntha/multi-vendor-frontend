@@ -1,8 +1,14 @@
 # multi-vendor-frontend
 Frontend Application Code for Multi-Vendor Web Application.
+Routes are Centralized at app folder.
+API Service names are replaced with xxxxApi instead of xxxxReducer.
+Implemented prepareHeaders at API Services, to include headers at time of base url.
+Initialised Bootstrap CDN Links at HTML file.
+Current Version: 6.1.5
+-----------------------------------------------------------------
 Organised Centralized Store files with Root Reducers & Middlewares, listeners separately.
 skipToken is implemented at Navbar component.
-Current Version: 6.1.4
+at this Version: 6.1.4
 -----------------------------------------------------------------
 Created Home folder for VendorDashboard & Unauthorized or User home.
 Altered as per Store Deletion functionality.

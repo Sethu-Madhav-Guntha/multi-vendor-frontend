@@ -5,52 +5,10 @@ import { Provider } from "react-redux";
 import { SnackbarProvider } from "notistack";
 
 import "./index.css";
-import App from "./App.jsx";
-import Home from "./pages/Home.jsx";
-import Login from "./pages/Login.jsx";
-import Register from "./pages/Register.jsx";
-import Outlets from "./pages/Outlets.jsx";
-import OutletDetails from "./features/outlet/OutletDetails.jsx";
-import Cart from "./pages/Cart.jsx";
-import Orders from "./pages/Orders.jsx";
 import { multiVendorStore } from "./app/store.js";
+import { routes } from "./app/routes.jsx";
 
-const multiVendorRouter = createBrowserRouter([
-  {
-    path: "/",
-    element: <App />,
-    children: [
-      {
-        path: "/",
-        element: <Home />,
-      },
-      {
-        path: "/outlets",
-        element: <Outlets />,
-      },
-      {
-        path: "/outlets/:outletId",
-        element: <OutletDetails />,
-      },
-      {
-        path: "/cart",
-        element: <Cart />,
-      },
-      {
-        path: "/orders",
-        element: <Orders />,
-      },
-      {
-        path: "/login",
-        element: <Login />,
-      },
-      {
-        path: "/register",
-        element: <Register />,
-      },
-    ],
-  },
-]);
+const multiVendorRouter = createBrowserRouter(routes);
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

@@ -14,9 +14,7 @@ import { useNotifier } from "../hooks/useNotifier";
 function Cart() {
   const token = useSelector((state) => state?.authReducer?.token);
 
-  const { data: cartItems, refetch: refetchCartItems } = useCartItemsQuery({
-    token,
-  });
+  const { data: cartItems, refetch: refetchCartItems } = useCartItemsQuery();
   const [fetchCartItemsFn] = useLazyCartItemsQuery();
   const [removeCartItemFn] = useRemoveItemMutation();
   const [clearCartFn] = useClearCartMutation();
@@ -27,8 +25,8 @@ function Cart() {
 
   const onIncrementItemClick = async (item) => {
     try {
-      await addToCartFn({ productId: item.product._id, token });
-      fetchCartItemsFn({ token });
+      await addToCartFn({ productId: item.product._id });
+      fetchCartItemsFn();
     } catch (err) {
       notificationMsg("error", err.message);
     }
@@ -38,10 +36,9 @@ function Cart() {
     try {
       await removeCartItemFn({
         productId: item.product._id,
-        token,
         removeAll: false,
       });
-      fetchCartItemsFn({ token });
+      fetchCartItemsFn();
     } catch (err) {
       notificationMsg("error", err.message);
     }
@@ -51,14 +48,13 @@ function Cart() {
     try {
       await removeCartItemFn({
         productId: item.product._id,
-        token,
         removeAll: true,
       });
       notificationMsg(
         "default",
         `${item.product.productName} Removed from Cart.`,
       );
-      fetchCartItemsFn({ token });
+      fetchCartItemsFn();
     } catch (err) {
       notificationMsg("error", err.message);
     }
@@ -66,9 +62,9 @@ function Cart() {
 
   const onClearCartClick = async () => {
     try {
-      await clearCartFn({ token });
+      await clearCartFn();
       notificationMsg("default", "Removed all items from Cart.");
-      fetchCartItemsFn({ token });
+      fetchCartItemsFn();
     } catch (err) {
       notificationMsg("error", err.message);
     }

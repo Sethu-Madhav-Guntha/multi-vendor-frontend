@@ -33,7 +33,7 @@ function OutletDetails() {
   const [deleteProductFn] = useRemoveProductMutation();
   const [fetchProductByIdFn] = useLazyFetchProductByIdQuery();
 
-  const { data: storeDetails } = useFetchOutletByIdQuery({ outletId, token });
+  const { data: storeDetails } = useFetchOutletByIdQuery({ outletId });
   const [fetchStoreDetailsFn] = useLazyFetchOutletByIdQuery();
   const { notificationMsg } = useNotifier();
 
@@ -55,10 +55,10 @@ function OutletDetails() {
 
   const onDeleteProductClick = async (productId) => {
     try {
-      const product = await fetchProductByIdFn({productId, token});
-      await deleteProductFn({ productId, token });
+      const product = await fetchProductByIdFn({productId});
+      await deleteProductFn({ productId });
       notificationMsg("default", `${product.data.product.productName} Product Removed.`);
-      fetchStoreDetailsFn({ outletId, token });
+      fetchStoreDetailsFn({ outletId });
     } catch (err) {
       notificationMsg("error", err.message);
     }
@@ -83,11 +83,10 @@ function OutletDetails() {
     } else {
       const createdProductDetials = await createProductFn({
         productInfo: { ...productFormData, storeId: outletId },
-        token,
       });
       notificationMsg("success", createdProductDetials.data.message);
     }
-    fetchStoreDetailsFn({ outletId, token });
+    fetchStoreDetailsFn({ outletId });
   };
 
   return (

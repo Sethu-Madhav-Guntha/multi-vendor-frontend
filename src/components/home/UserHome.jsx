@@ -29,8 +29,7 @@ function UserHome() {
     try {
       const addProductToCartResut = await addToCartFn({
         productId,
-        sellingPrice,
-        token: userInfo?.token,
+        sellingPrice
       });
       notificationMsg("success", addProductToCartResut.data.message);
       await fetchAllProductsFn();

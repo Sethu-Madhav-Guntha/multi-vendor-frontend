@@ -5,11 +5,15 @@ import Footer from "./components/Footer";
 
 function App() {
   return (
-    <>
-      <Navbar></Navbar>
-      <Outlet></Outlet>
-      <Footer></Footer>
-    </>
+    <div className="d-flex flex-column min-vh-100">
+      <Navbar />
+
+      <main className="flex-grow-1 container-fluid py-3">
+        <Outlet />
+      </main>
+
+      <Footer />
+    </div>
   );
 }
 

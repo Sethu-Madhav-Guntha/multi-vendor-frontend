@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 const BASE_URI = import.meta.env.VITE_BACKEND_BASE_URI;
 
 export const authApi = createApi({
-    reducerPath: "authenticationReducer",
+    reducerPath: "authApi",
     baseQuery: fetchBaseQuery({
         baseUrl: `${BASE_URI}/auth`
     }),

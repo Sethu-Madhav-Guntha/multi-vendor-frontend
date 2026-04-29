@@ -21,7 +21,6 @@ function Outlets() {
   const storeImgRef = useRef();
   const storeDiscountRef = useRef();
 
-  const token = useSelector((state) => state?.authReducer?.token);
   const { notificationMsg } = useNotifier();
 
   const [createOutletFn] = useCreateOutletMutation();
@@ -29,7 +28,7 @@ function Outlets() {
   const [removeOutletFn] = useRemoveOutletMutation();
   const [fetchOutletsFn] = useLazyFetchOutletsQuery();
   const [fetchOutletByIdFn] = useLazyFetchOutletByIdQuery();
-  const { data: vendorOutletsData } = useFetchOutletsQuery(token);
+  const { data: vendorOutletsData } = useFetchOutletsQuery();
 
   useEffect(() => {
     notificationMsg("info", vendorOutletsData?.message);
@@ -51,12 +50,12 @@ function Outlets() {
 
   const onRemoveOutletClick = async (outlet) => {
     try {
-      await removeOutletFn({ id: outlet._id, token });
+      await removeOutletFn({ id: outlet._id });
       notificationMsg(
         "default",
         `${outlet.storeName} & it's Products were Removed`,
       );
-      await fetchOutletsFn(token);
+      await fetchOutletsFn();
     } catch (err) {
       notificationMsg("error", err.message);
     }
@@ -73,18 +72,16 @@ function Outlets() {
           _id: outletDetails._id,
           ...outletFormData,
         },
-        token,
       });
       setEditFlag(false);
       notificationMsg("success", updateOutletData.data.message);
     } else {
       const createdOutletData = await createOutletFn({
         outletInfo: outletFormData,
-        token,
       });
       notificationMsg("success", createdOutletData.data.message);
     }
-    await fetchOutletsFn(token);
+    await fetchOutletsFn();
   };
 
   return (
