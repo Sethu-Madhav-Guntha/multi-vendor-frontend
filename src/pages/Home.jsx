@@ -2,20 +2,23 @@ import { useSelector } from "react-redux";
 
 import VendorDashboard from "../components/home/VendorDashboard";
 import UserHome from "../components/home/UserHome";
+import { selectIsAuthenticatedUser, selectIsUser, selectIsVendor } from "../features/auth/authSelectors";
 
 function Home() {
-  const userInfo = useSelector((state) => state?.authReducer);
+  const isUserAuthenticated = useSelector(selectIsAuthenticatedUser);
+  const isUser = useSelector(selectIsUser);
+  const isVendor = useSelector(selectIsVendor);
 
   return (
     <>
-      {userInfo?.user?.role === "Vendor" && (
+      {isVendor && (
         <>
-        <VendorDashboard></VendorDashboard>
+          <VendorDashboard></VendorDashboard>
         </>
       )}
-      {(!userInfo || !(userInfo?.user?.role === "Vendor")) && (
+      {(isUser || !isUserAuthenticated) && (
         <>
-        <UserHome></UserHome>
+          <UserHome></UserHome>
         </>
       )}
     </>

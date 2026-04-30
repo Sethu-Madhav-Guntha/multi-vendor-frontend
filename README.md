@@ -1,9 +1,13 @@
 # multi-vendor-frontend
 Frontend Application Code for Multi-Vendor Web Application.
+Implemented Bootstrap for Responsive UI.
+Altered Pages into multiple Components.
+Current Version: 7.0.0
+-----------------------------------------------------------------
 Navbar has been designed & useAuthNavbar custom hook is created.
 token is being modified through utility functions.
 Static footer section is generated.
-Current Version: 6.1.6
+at this Version: 6.1.6
 -----------------------------------------------------------------
 Routes are Centralized at app folder.
 API Service names are replaced with xxxxApi instead of xxxxReducer.

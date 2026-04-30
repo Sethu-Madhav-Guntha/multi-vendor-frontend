@@ -1,7 +1,6 @@
 import { useRef, useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
 
+import { useNotifier } from "../hooks/useNotifier";
 import {
   useCreateOutletMutation,
   useLazyFetchOutletByIdQuery,
@@ -10,16 +9,19 @@ import {
   useRemoveOutletMutation,
   useUpdateOutletMutation,
 } from "../features/outlet/outletService";
-import { useNotifier } from "../hooks/useNotifier";
+import OutletForm from "../components/outlets/OutletForm";
+import OutletCard from "../components/outlets/OutletCard";
 
 function Outlets() {
   const [editFlag, setEditFlag] = useState(false);
   const [outletDetails, setOutletDetails] = useState(null);
 
-  const storeNameRef = useRef();
-  const descriptionRef = useRef();
-  const storeImgRef = useRef();
-  const storeDiscountRef = useRef();
+  const refs = {
+    storeNameRef: useRef(),
+    descriptionRef: useRef(),
+    storeImgRef: useRef(),
+    storeDiscountRef: useRef(),
+  };
 
   const { notificationMsg } = useNotifier();
 
@@ -35,17 +37,13 @@ function Outlets() {
   }, [vendorOutletsData]);
 
   const onUpdateOutletClick = (outlet) => {
-    try {
-      storeNameRef.current.value = outlet.storeName;
-      descriptionRef.current.value = outlet.description;
-      storeImgRef.current.value = outlet.storeImg;
-      storeDiscountRef.current.value = outlet.storeDiscount;
-      setOutletDetails(outlet);
-      setEditFlag(true);
-      notificationMsg("warning", `updating ${outlet.storeName} details`);
-    } catch (err) {
-      notificationMsg("error", err.message);
-    }
+    refs.storeNameRef.current.value = outlet.storeName;
+    refs.descriptionRef.current.value = outlet.description;
+    refs.storeImgRef.current.value = outlet.storeImg;
+    refs.storeDiscountRef.current.value = outlet.storeDiscount;
+    setOutletDetails(outlet);
+    setEditFlag(true);
+    notificationMsg("warning", `Updating ${outlet.storeName} details`);
   };
 
   const onRemoveOutletClick = async (outlet) => {
@@ -53,7 +51,7 @@ function Outlets() {
       await removeOutletFn({ id: outlet._id });
       notificationMsg(
         "default",
-        `${outlet.storeName} & it's Products were Removed`,
+        `${outlet.storeName} & its Products were Removed`,
       );
       await fetchOutletsFn();
     } catch (err) {
@@ -61,17 +59,15 @@ function Outlets() {
     }
   };
 
-  const onOutletDetailsSubmit = async () => {
+  const onOutletDetailsSubmit = async (event) => {
     event.preventDefault();
     const outletForm = new FormData(event.target);
     const outletFormData = Object.fromEntries(outletForm.entries());
     event.target.reset();
+
     if (editFlag) {
       const updateOutletData = await updateOutletFn({
-        outletInfo: {
-          _id: outletDetails._id,
-          ...outletFormData,
-        },
+        outletInfo: { _id: outletDetails._id, ...outletFormData },
       });
       setEditFlag(false);
       notificationMsg("success", updateOutletData.data.message);
@@ -85,79 +81,34 @@ function Outlets() {
   };
 
   return (
-    <>
-      <h1>Outlets Page</h1>
-      <form onSubmit={onOutletDetailsSubmit}>
-        <label htmlFor="storeNameId">Enter Store Name:</label>
-        <input
-          type="text"
-          name="storeName"
-          id="storeNameId"
-          placeholder="Provide Store Name Here"
-          ref={storeNameRef}
-        />
-        <br />
-        <label htmlFor="descriptionId">Enter Store Description:</label>
-        <textarea
-          name="description"
-          id="descriptionId"
-          placeholder="Provide Store Description Here"
-          ref={descriptionRef}
-        />
-        <br />
-        <label htmlFor="outletImgId">Outlet Image URL:</label>
-        <input
-          type="text"
-          name="storeImg"
-          id="outletImgId"
-          placeholder="Provide Store Image URL Here"
-          ref={storeImgRef}
-        />
-        <br />
-        <label htmlFor="storeDiscountId">Store Discount: </label>
-        <input
-          type="number"
-          name="storeDiscount"
-          id="storeDiscountId"
-          defaultValue={0}
-          ref={storeDiscountRef}
-        />
-        <br />
-        <button type="submit">{editFlag ? "Update" : "Create"} Outlet</button>
-      </form>
+    <div className="container py-4">
+      <h1 className="mb-4">🏬 Outlets</h1>
 
-      <h2>Outlet List:</h2>
+      <OutletForm
+        editFlag={editFlag}
+        onSubmit={onOutletDetailsSubmit}
+        refs={refs}
+      />
 
-      <ul>
-        {vendorOutletsData &&
-          vendorOutletsData?.storesList?.map((outlet) => (
-            <li key={outlet._id}>
-              <Link to={`/outlets/${outlet._id}`}>{outlet.storeName}</Link>
-              <img
-                src={outlet.storeImg}
-                alt={outlet.storeName}
-                style={{ width: "100px", height: "100px" }}
-              />
-              <div>{outlet.description}</div>
-              <div>Store Discount: {outlet.storeDiscount}%</div>
-              <button
-                onClick={() => {
-                  onUpdateOutletClick(outlet);
-                }}
-              >
-                Update
-              </button>
-              <button
-                onClick={() => {
-                  onRemoveOutletClick(outlet);
-                }}
-              >
-                Remove
-              </button>
-            </li>
-          ))}
-      </ul>
-    </>
+      <h2 className="mb-3">Outlet List</h2>
+      <div className="row">
+        {vendorOutletsData?.storesList?.length > 0 ? (
+          vendorOutletsData.storesList.map((outlet) => (
+            <OutletCard
+              key={outlet._id}
+              outlet={outlet}
+              onUpdate={onUpdateOutletClick}
+              onRemove={onRemoveOutletClick}
+            />
+          ))
+        ) : (
+          <div className="alert alert-info text-center">
+            No outlets available
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
+
 export default Outlets;

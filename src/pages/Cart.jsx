@@ -10,6 +10,7 @@ import {
 } from "../features/cart/cartService";
 import { useCreateOrderMutation } from "../features/order/orderService";
 import { useNotifier } from "../hooks/useNotifier";
+import CartItem from "../components/CartItem";
 
 function Cart() {
   const token = useSelector((state) => state?.authReducer?.token);
@@ -34,10 +35,7 @@ function Cart() {
 
   const onDecrementItemClick = async (item) => {
     try {
-      await removeCartItemFn({
-        productId: item.product._id,
-        removeAll: false,
-      });
+      await removeCartItemFn({ productId: item.product._id, removeAll: false });
       fetchCartItemsFn();
     } catch (err) {
       notificationMsg("error", err.message);
@@ -46,10 +44,7 @@ function Cart() {
 
   const onRemoveItemClick = async (item) => {
     try {
-      await removeCartItemFn({
-        productId: item.product._id,
-        removeAll: true,
-      });
+      await removeCartItemFn({ productId: item.product._id, removeAll: true });
       notificationMsg(
         "default",
         `${item.product.productName} Removed from Cart.`,
@@ -75,7 +70,7 @@ function Cart() {
       const items = cartItems?.cart?.items?.map((item) => ({
         productId: item.product._id,
         quantity: item.quantity,
-        sellingPrice: item?.product?.sellingPrice,
+        sellingPrice: item.product?.sellingPrice,
       }));
       await createOrderFn({ items, token });
       notificationMsg("success", "Cart Items have placed Order.");
@@ -91,64 +86,47 @@ function Cart() {
   }, [cartItems]);
 
   return (
-    <>
-      <h1>Cart Page</h1>
-      <h2>Products added to Cart</h2>
-      {cartItems?.cart?.items.length > 0 && (
+    <div className="container py-4">
+      <h1 className="mb-3">🛒 Cart</h1>
+
+      {cartItems?.cart?.items?.length > 0 ? (
         <>
-          <h4>Total Price: {cartItems?.totalAmount}/-</h4>
-          <button
-            onClick={() => {
-              onClearCartClick();
-            }}
-          >
-            Clear Cart Items
-          </button>
-          <button onClick={() => onBuyNowClick()}>Buy Items</button>
-        </>
-      )}
-      <ul>
-        {cartItems &&
-          cartItems?.cart?.items?.map((item) => (
-            <li key={item._id}>
-              <h4>Item Name: {item.product?.productName}</h4>
-              <h5>Price: {item.product?.price}</h5>
-              <h5>Quantity: {item.quantity}</h5>
-              <img
-                src={item.product?.productImageUrl}
-                alt={item.product?.productName}
-                style={{ width: "200px", height: "200px" }}
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h4>Total Cart Price: 💰 ₹{cartItems?.totalAmount}/-</h4>
+            <div className="btn-group">
+              <div className="btn-group">
+                <button
+                  className="btn btn-outline-danger"
+                  onClick={onClearCartClick}
+                >
+                  <i className="bi bi-trash"></i> Clear Cart
+                </button>
+                <button className="btn btn-outline-primary" onClick={onBuyNowClick}>
+                  <i className="bi bi-bag-check"></i> Buy Now
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="row">
+            {cartItems?.cart?.items?.map((item) => (
+              <CartItem
+                key={item._id}
+                item={item}
+                onDecrement={onDecrementItemClick}
+                onIncrement={onIncrementItemClick}
+                onRemove={onRemoveItemClick}
               />
-              <h5>Product Discount: {item.product?.productDiscount}</h5>
-              <h5>Store Discount: {item.product?.store.storeDiscount}</h5>
-              <h5>Store Name: {item.product?.store.storeName}</h5>
-              <h5>Store Owner: {item.product?.store.owner.username}</h5>
-              <br />
-              <button
-                onClick={() => {
-                  onDecrementItemClick(item);
-                }}
-              >
-                Decrement Item
-              </button>
-              <button
-                onClick={() => {
-                  onIncrementItemClick(item);
-                }}
-              >
-                Increment Item
-              </button>
-              <button
-                onClick={() => {
-                  onRemoveItemClick(item);
-                }}
-              >
-                Remove Item
-              </button>
-            </li>
-          ))}
-      </ul>
-    </>
+            ))}
+          </div>
+        </>
+      ) : (
+        <div className="alert alert-info text-center">
+          🛒 Your cart is empty. Start adding products!
+        </div>
+      )}
+    </div>
   );
 }
+
 export default Cart;

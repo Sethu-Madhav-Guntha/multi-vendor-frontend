@@ -1,6 +1,6 @@
-import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { skipToken } from "@reduxjs/toolkit/query";
+import { useSelector } from "react-redux";
 
 import {
   useCancelOrderMutation,
@@ -15,6 +15,8 @@ import {
 } from "../features/order/orderService";
 import { useFetchOutletsQuery } from "../features/outlet/outletService";
 import { useNotifier } from "../hooks/useNotifier";
+import OrderItem from "../components/OrderItem";
+import { selectIsUser, selectIsVendor } from "../features/auth/authSelectors";
 
 function Orders() {
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -22,8 +24,8 @@ function Orders() {
     storeId: "All",
     storeName: "All Stores",
   });
-
-  const userRole = useSelector((state) => state?.authReducer?.user?.role);
+  const isVendor = useSelector(selectIsVendor);
+  const isUser = useSelector(selectIsUser);
 
   const { data: customerOrders } = useGetCustomerOrdersQuery();
   const [getCustomerOrdersFn] = useLazyGetCustomerOrdersQuery();
@@ -32,16 +34,16 @@ function Orders() {
 
   const { data: storeOrders } = useListStoreOrdersQuery(
     selectedStore.storeId !== "All"
-      ? {
-          storeId: selectedStore.storeId,
-        }
+      ? { storeId: selectedStore.storeId }
       : skipToken,
   );
   const [listStoreOrdersFn] = useLazyListStoreOrdersQuery();
+
   const { data: vendorOrders } = useVendorOrdersQuery(
     selectedStore.storeId === "All" ? "" : skipToken,
   );
   const [listVendorOrdersFn] = useLazyVendorOrdersQuery();
+
   const { data: vendorOutlets } = useFetchOutletsQuery();
   const [updateOrderStatusFn] = useUpdateOrderMutation();
 
@@ -57,7 +59,7 @@ function Orders() {
       await cancelOrderFn({ orderId: order._id });
       notificationMsg(
         "warning",
-        `${order.items[0].product.productName} has been canceled.`,
+        `${order.items[0].product.productName} canceled.`,
       );
       getCustomerOrdersFn();
     } catch (err) {
@@ -74,7 +76,7 @@ function Orders() {
     }
   };
 
-  const onStoreSelectionChange = () => {
+  const onStoreSelectionChange = (event) => {
     setSelectedStore({
       storeId: event.target.value,
       storeName: event.target.options[event.target.selectedIndex].text,
@@ -87,174 +89,94 @@ function Orders() {
 
   const onStatusChange = async (order, newStatus) => {
     try {
-      await updateOrderStatusFn({
-        orderId: order._id,
-        status: newStatus
-      });
-      if (selectedStore.storeId === "All") {
-        listVendorOrdersFn(
-          selectedStore.storeId === "All" ? "" : skipToken,
-        );
-      } else {
-        listStoreOrdersFn(
-          selectedStore.storeId !== "All"
-            ? {
-                storeId: selectedStore.storeId,
-              }
-            : skipToken,
-        );
-      }
+      await updateOrderStatusFn({ orderId: order._id, status: newStatus });
+      selectedStore.storeId === "All"
+        ? listVendorOrdersFn("")
+        : listStoreOrdersFn({ storeId: selectedStore.storeId });
+      setSelectedOrder("");
       notificationMsg(
         "info",
-        `${order.items[0].product.productName} Order Updated.`,
+        `${order.items[0].product.productName} status updated.`,
       );
     } catch (err) {
       notificationMsg("error", err.message);
     }
   };
 
-  let ordersData = selectedStore.storeId === "All" ? vendorOrders : storeOrders;
+  const ordersData =
+    selectedStore.storeId === "All" ? vendorOrders : storeOrders;
 
   return (
-    <>
-      <h1>Orders Page</h1>
-      {userRole === "User" && (
+    <div className="container py-4">
+      <h1 className="mb-4">📦 Orders</h1>
+
+      {isUser && (
         <>
-          {customerOrders?.orders.length <= 0 && (
-            <>
-              <h2>There are no Orders to Display</h2>
-            </>
+          {customerOrders?.orders?.length <= 0 ? (
+            <div className="alert alert-info text-center">
+              No orders to display
+            </div>
+          ) : (
+            customerOrders?.orders?.map((order) => (
+              <OrderItem
+                key={order._id}
+                order={order}
+                selectedOrder={selectedOrder}
+                onCancel={onCancelOrderClick}
+                onDetails={onOrderDetailsClick}
+              />
+            ))
           )}
-          <ul>
-            {customerOrders?.orders?.map((order) => (
-              <li key={order._id}>
-                <ul>
-                  {order?.items?.map((item) => (
-                    <li key={item._id}>
-                      <img
-                        src={item.product?.productImageUrl}
-                        alt={item.product?.productName}
-                      />
-                      <h5>{item?.product?.productName}</h5>
-                      <h6>Quantity: {item?.quantity}</h6>
-                      <h5>Total: {order?.totalAmount}</h5>
-                      <h5>Status: {order?.status}</h5>
-                      {selectedOrder === order._id && (
-                        <>
-                          <h6>
-                            Product Discount: {item?.product?.productDiscount}
-                          </h6>
-                          <h6>
-                            Store Discount:{" "}
-                            {item?.product?.store?.storeDiscount}
-                          </h6>
-                          <h6>Store Name: {item?.product?.store?.storeName}</h6>
-                          <h6>Owner: {item?.product?.store?.owner.username}</h6>
-                          <img
-                            src={item?.product?.store?.owner.profileImg}
-                            alt={item?.product?.store?.owner.username}
-                            style={{ width: "100px", height: "100px" }}
-                          />
-                        </>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-                {order?.status === "Pending" && (
-                  <>
-                    <button
-                      onClick={() => onCancelOrderClick(order)}
-                      disabled={order?.status !== "Pending"}
-                    >
-                      Cancel Order
-                    </button>
-                  </>
-                )}
-                <button
-                  onClick={() => {
-                    onOrderDetailsClick(order._id);
-                  }}
-                >
-                  Order Details
-                </button>
-                <hr />
-              </li>
-            ))}
-          </ul>
         </>
       )}
-      {userRole === "Vendor" && (
+
+      {isVendor && (
         <>
-          <label htmlFor="outletId">Choose Outlet Orders</label>
-          <select
-            name="outlet"
-            id="outletId"
-            value={selectedStore.storeId}
-            onChange={onStoreSelectionChange}
-          >
-            <option value="All">All Stores</option>
-            {vendorOutlets?.storesList?.map((store) => (
-              <option key={store._id} value={store._id}>
-                {store.storeName}
-              </option>
-            ))}
-          </select>
-          <h1>
-            Orders at &nbsp;
+          <div className="mb-3">
+            <label htmlFor="outletId" className="form-label">
+              Choose Outlet Orders
+            </label>
+            <select
+              id="outletId"
+              className="form-select"
+              value={selectedStore.storeId}
+              onChange={onStoreSelectionChange}
+            >
+              <option value="All">All Stores</option>
+              {vendorOutlets?.storesList?.map((store) => (
+                <option key={store._id} value={store._id}>
+                  {store.storeName}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <h2 className="mb-4">
+            Orders at{" "}
             {selectedStore.storeId === "All"
               ? "All Stores"
               : selectedStore.storeName}
-          </h1>
-          <ul>
-            {ordersData?.orders?.map((order) => (
-              <li key={order._id}>
-                <ul>
-                  {order?.items?.map((item) => (
-                    <li key={item._id}>
-                      <h4>Item: {item?.product?.productName}</h4>
-                      <h5>Quantity: {item.quantity}</h5>
-                      <h6></h6>
-                    </li>
-                  ))}
-                </ul>
-                {selectedOrder === order._id && (
-                  <>
-                    <h6>Store: {order.store.storeName}</h6>
-                    <span>Current Status: {order.status}</span>
-                    <h5>Ordered By: {order.user.username}</h5>
-                    <img
-                      src={order.user.profileImg}
-                      alt={order.user.username}
-                      style={{ width: "100px", height: "100px" }}
-                    />
-                    <br />
-                    <label htmlFor="updateStatusId">Update Status</label>
-                    <select
-                      id="updateStatusId"
-                      value={order.status}
-                      onChange={(e) => onStatusChange(order, e.target.value)}
-                    >
-                      <option value="Pending">Pending</option>
-                      <option value="Accepted">Accepted</option>
-                      <option value="Delivered">Delivered</option>
-                      <option value="Canceled">Canceled</option>
-                    </select>
-                  </>
-                )}
-                <button
-                  onClick={() => {
-                    onOrderDetailsClick(order._id);
-                  }}
-                >
-                  Order Details
-                </button>
-                <hr />
-              </li>
-            ))}
-          </ul>
+          </h2>
+
+          {ordersData?.orders?.length <= 0 ? (
+            <div className="alert alert-info text-center">
+              No orders found for {selectedStore.storeName}
+            </div>
+          ) : (
+            ordersData?.orders?.map((order) => (
+              <OrderItem
+                key={order._id}
+                order={order}
+                selectedOrder={selectedOrder}
+                onDetails={onOrderDetailsClick}
+                onStatusChange={onStatusChange}
+              />
+            ))
+          )}
         </>
       )}
-    </>
+    </div>
   );
 }
+
 export default Orders;

@@ -1,10 +1,10 @@
 import App from "../App";
-import OutletDetails from "../features/outlet/OutletDetails";
-import Cart from "../pages/Cart";
 import Home from "../pages/Home";
-import Login from "../pages/Login";
-import Orders from "../pages/Orders";
 import Outlets from "../pages/Outlets";
+import OutletDetails from "../pages/OutletDetails";
+import Cart from "../pages/Cart";
+import Orders from "../pages/Orders";
+import Login from "../pages/Login";
 import Register from "../pages/Register";
 
 export const routes = [

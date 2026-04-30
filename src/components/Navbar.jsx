@@ -1,13 +1,12 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 import { useAuthNavbar } from "../hooks/useAuthNavbar";
-import { useEffect } from "react";
 
 function Navbar() {
   const { userInfo, isVendor, isUser, isAuthenticated, onLogoutClick } =
     useAuthNavbar();
 
-  // Helper to close the mobile menu
   const closeNavCollapse = () => {
     const navCollapse = document.getElementById("navbarNav");
     if (navCollapse) {
@@ -15,7 +14,6 @@ function Navbar() {
     }
   };
 
-  // Close toggler when focus is lost (click outside entire navbar)
   const handleDocumentClick = (e) => {
     const navCollapse = document.getElementById("navbarNav");
     const toggler = document.querySelector(".navbar-toggler");
@@ -29,7 +27,6 @@ function Navbar() {
     }
   };
 
-  // Attach global click listener once
   useEffect(() => {
     document.addEventListener("click", handleDocumentClick);
     return () => {
@@ -37,7 +34,6 @@ function Navbar() {
     };
   }, []);
 
-  // Wrap logout to also reset toggler
   const handleLogout = () => {
     closeNavCollapse();
     onLogoutClick();
@@ -46,7 +42,6 @@ function Navbar() {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
       <div className="container-fluid">
-        {/* Brand Logo */}
         <Link
           className="navbar-brand d-flex align-items-center"
           to="/"
@@ -55,13 +50,12 @@ function Navbar() {
           <img
             src="/mvlogo.png"
             alt="App Logo"
-            className="rounded me-2"
+            className="rounded-circle me-2"
             style={{ width: "40px", height: "40px" }}
           />
           MultiVendor
         </Link>
 
-        {/* Mobile Toggler */}
         <button
           className="navbar-toggler"
           type="button"
@@ -74,7 +68,6 @@ function Navbar() {
           <span className="navbar-toggler-icon"></span>
         </button>
 
-        {/* Collapsible Nav Links */}
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ms-auto">
             {isAuthenticated ? (
@@ -86,7 +79,7 @@ function Navbar() {
                       to="/outlets"
                       onClick={closeNavCollapse}
                     >
-                      Outlets
+                      <i className="bi bi-building"></i> Outlets
                     </Link>
                   </li>
                 )}
@@ -97,7 +90,7 @@ function Navbar() {
                       to="/cart"
                       onClick={closeNavCollapse}
                     >
-                      Cart
+                      <i className="bi bi-cart"></i> Cart
                     </Link>
                   </li>
                 )}
@@ -107,11 +100,10 @@ function Navbar() {
                     to="/orders"
                     onClick={closeNavCollapse}
                   >
-                    Orders
+                    <i className="bi bi-box-seam"></i> Orders
                   </Link>
                 </li>
 
-                {/* User Profile Dropdown */}
                 <li className="nav-item dropdown">
                   <img
                     src={userInfo?.profileImg}
@@ -128,6 +120,7 @@ function Navbar() {
                   >
                     <li>
                       <span className="dropdown-item-text">
+                        <i className="bi bi-person-circle me-2"></i>
                         {userInfo?.username}
                       </span>
                     </li>
@@ -136,7 +129,7 @@ function Navbar() {
                     </li>
                     <li>
                       <button className="dropdown-item" onClick={handleLogout}>
-                        Log Out
+                        <i className="bi bi-box-arrow-right"></i> Log Out
                       </button>
                     </li>
                   </ul>
@@ -150,7 +143,7 @@ function Navbar() {
                     to="/login"
                     onClick={closeNavCollapse}
                   >
-                    Login
+                    <i className="bi bi-box-arrow-in-right"></i> Login
                   </Link>
                 </li>
                 <li className="nav-item">
@@ -159,7 +152,7 @@ function Navbar() {
                     to="/register"
                     onClick={closeNavCollapse}
                   >
-                    Register
+                    <i className="bi bi-person-plus"></i> Register
                   </Link>
                 </li>
               </>
