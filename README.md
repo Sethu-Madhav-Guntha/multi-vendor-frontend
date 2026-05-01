@@ -1,7 +1,10 @@
 # multi-vendor-frontend
 Frontend Application Code for Multi-Vendor Web Application.
+Modified vercel.json file as per frontend deployment
+Current Version: 7.0.2
+-----------------------------------------------------------------
 vercel.json file is added for hosting application.
-Current Version: 7.0.1
+at this Version: 7.0.1
 -----------------------------------------------------------------
 Implemented Bootstrap for Responsive UI.
 Altered Pages into multiple Components.
