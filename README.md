@@ -1,8 +1,11 @@
 # multi-vendor-frontend
 Frontend Application Code for Multi-Vendor Web Application.
+vercel.json file is added for hosting application.
+Current Version: 7.0.1
+-----------------------------------------------------------------
 Implemented Bootstrap for Responsive UI.
 Altered Pages into multiple Components.
-Current Version: 7.0.0
+at this Version: 7.0.0
 -----------------------------------------------------------------
 Navbar has been designed & useAuthNavbar custom hook is created.
 token is being modified through utility functions.
