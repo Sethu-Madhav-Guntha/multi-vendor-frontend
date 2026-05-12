@@ -9,7 +9,7 @@ function OutletCard({ outlet, onUpdate, onRemove }) {
           src={outlet.storeImg}
           alt={outlet.storeName}
           className="card-img-top"
-          style={{ height: "200px", objectFit: "cover" }}
+          style={{ height: "200px", objectFit: "contain" }}
         />
         <div className="card-body">
           <h5 className="card-title fw-bold">{outlet.storeName}</h5>

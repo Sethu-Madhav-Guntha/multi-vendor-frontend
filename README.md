@@ -1,7 +1,10 @@
 # multi-vendor-frontend
 Frontend Application Code for Multi-Vendor Web Application.
+Modified Vendor Home for displaing Vendor Products. 
+Current Version: 7.1.0
+-----------------------------------------------------------------
 Modified vercel.json file as per frontend deployment
-Current Version: 7.0.2
+at this Version: 7.0.2
 -----------------------------------------------------------------
 vercel.json file is added for hosting application.
 at this Version: 7.0.1

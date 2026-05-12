@@ -1,16 +1,39 @@
+import { useEffect, useMemo } from "react";
+import { useSelector } from "react-redux";
+
+import {
+  useFetchAllProductsQuery,
+  useLazyFetchAllProductsQuery,
+} from "../../features/products/productService";
+import { useNotifier } from "../../hooks/useNotifier";
+import { selectUser } from "../../features/auth/authSelectors";
+import ProductCard from "./ProductCard";
+
 function VendorDashboard() {
+  const { data: allProductsInfo } = useFetchAllProductsQuery();
+  const { notificationMsg } = useNotifier();
+  const user = useSelector(selectUser);
+
+  const vendorProducts = useMemo(() => {
+    if (!allProductsInfo?.products) return [];
+    return allProductsInfo.products.filter(
+      (product) => product.store.owner._id === user.userId,
+    );
+  }, [allProductsInfo, user.userId]);
+
+  useEffect(() => {
+    if (vendorProducts.length > 0) {
+      notificationMsg("info", "Fetched Vendor Products");
+    }
+  }, [vendorProducts]);
+
   return (
-    <div className="container py-5 text-center">
-      <img
-        src="https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg"
-        alt="Vendor Home"
-        style={{
-          borderRadius: "10px",
-          width: "100%",
-          height: "auto",
-          objectFit: "cover",
-        }}
-      />
+    <div className="container py-4">
+      <div className="row">
+        {vendorProducts.map((product) => (
+          <ProductCard key={product._id} product={product} />
+        ))}
+      </div>
     </div>
   );
 }
